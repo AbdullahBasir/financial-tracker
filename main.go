@@ -9,7 +9,7 @@ func main() {
 
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /health", handlerReadiness)
+	router.HandleFunc("GET /health", handlerHealth)
 
 	serverStruct := &http.Server{
 		Addr:    ":8080",
