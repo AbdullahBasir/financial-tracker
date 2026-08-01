@@ -25,10 +25,10 @@ fi
 
 case "$1" in
   up)
-    goose --dir sql/schema postgres "$DB_URL" up
+    goose --dir database/migrations postgres "$DB_URL" up
     ;;
   down)
-    goose --dir sql/schema postgres "$DB_URL" down
+    goose --dir database/migrations postgres "$DB_URL" down
     ;;
   *)
     echo "Unknown command: $1"

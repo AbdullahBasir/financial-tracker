@@ -4,13 +4,15 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/AbdullahBasir/financial-tracker/internal/handler"
 )
 
 func main() {
 
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /health", handlerHealth)
+	router.HandleFunc("GET /health", handler.HandlerHealth)
 
 	serverStruct := &http.Server{
 		Addr:         ":8080",
