@@ -9,10 +9,14 @@ import (
 )
 
 func main() {
+	cfg := handler.LoadConfig()
 
 	router := http.NewServeMux()
 
 	router.HandleFunc("GET /health", handler.HandlerHealth)
+
+	router.HandleFunc("POST /auth/register", cfg.HandlerRegister)
+	router.HandleFunc("POST /auth/Login", cfg.HandlerLogin)
 
 	serverStruct := &http.Server{
 		Addr:         ":8080",
