@@ -4,10 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"os"
-	"time"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
-	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -15,13 +13,6 @@ import (
 type apiConfig struct {
 	dbQueries *sqlc.Queries
 	JwtSecret string
-}
-
-type User struct {
-	ID           uuid.UUID `json:"id"`
-	Email        string    `json:"email"`
-	PasswordHash string    `json:"-"`
-	CreatedAt    time.Time `json:"created_at"`
 }
 
 func LoadConfig() apiConfig {
