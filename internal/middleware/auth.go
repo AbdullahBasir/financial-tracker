@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -27,6 +28,11 @@ func Auth(next http.Handler) http.Handler {
 			handler.RespondWithError(w, http.StatusUnauthorized, fmt.Sprintf("unauthorized access: %v", err))
 			return
 		}
+
+		claims := token.Claims.(*jwt.RegisteredClaims)
+		ctx := context.WithValue(r.Context(), "claims", claims)
+		r = r.WithContext(ctx)
+
 		next.ServeHTTP(w, r)
 	})
 }

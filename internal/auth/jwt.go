@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -19,20 +18,4 @@ func MakeJWT(userID uuid.UUID, tokenSecret string, expiresIn time.Duration) (str
 	})
 	tokenString, err := claims.SignedString(key)
 	return tokenString, err
-}
-
-func ValidateJWT(tokenString, tokenSecret string) (uuid.UUID, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
-		return []byte(tokenSecret), nil
-	})
-	if err != nil || !token.Valid {
-		return uuid.Nil, err
-	} else if access, ok := token.Claims.(*jwt.RegisteredClaims); ok {
-		convert, err := uuid.Parse(access.Subject)
-		if err != nil {
-			return uuid.Nil, err
-		}
-		return convert, nil
-	}
-	return uuid.Nil, errors.New("unknown claims type, cannot proceed")
 }
