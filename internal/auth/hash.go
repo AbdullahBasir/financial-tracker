@@ -10,10 +10,10 @@ func HashPassword(password string) (string, error) {
 	return hash, nil
 }
 
-func CheckPasswordHash(password, hash string) (*bool, error) {
+func CheckPasswordHash(password, hash string) (bool, error) {
 	match, err := argon2id.ComparePasswordAndHash(password, hash)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
-	return &match, nil
+	return match, nil
 }

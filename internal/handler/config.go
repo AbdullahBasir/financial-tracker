@@ -14,7 +14,7 @@ import (
 
 type apiConfig struct {
 	dbQueries *sqlc.Queries
-	jwtSecret string
+	JwtSecret string
 }
 
 type User struct {
@@ -46,6 +46,6 @@ func LoadConfig() apiConfig {
 
 	return apiConfig{
 		dbQueries: dbQueries,
-		jwtSecret: jwtSecret,
+		JwtSecret: jwtSecret,
 	}
 }

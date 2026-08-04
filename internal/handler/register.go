@@ -19,18 +19,18 @@ func (cfg *apiConfig) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&params)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("could not access request body: %v", err))
+		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("could not access request body: %v", err))
 		return
 	}
 
 	if params.Email == "" || params.Password == "" {
-		respondWithError(w, http.StatusBadRequest, "email and password are required")
+		RespondWithError(w, http.StatusBadRequest, "email and password are required")
 		return
 	}
 
 	hashedPassword, err := auth.HashPassword(params.Password)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not hash password: %v", err))
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not hash password: %v", err))
 		return
 	}
 
@@ -39,10 +39,10 @@ func (cfg *apiConfig) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 		PasswordHash: hashedPassword,
 	})
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not register user: %v", err))
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not register user: %v", err))
 		return
 	}
-	respondWithJSON(w, http.StatusCreated, User{
+	RespondWithJSON(w, http.StatusCreated, User{
 		ID:           user.ID,
 		Email:        user.Email,
 		PasswordHash: user.PasswordHash,

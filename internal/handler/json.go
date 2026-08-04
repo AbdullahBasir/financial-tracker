@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func respondWithJSON(w http.ResponseWriter, status int, payload interface{}) error {
+func RespondWithJSON(w http.ResponseWriter, status int, payload interface{}) error {
 	response, err := json.Marshal(payload)
 	if err != nil {
 		return err
@@ -17,6 +17,6 @@ func respondWithJSON(w http.ResponseWriter, status int, payload interface{}) err
 	return nil
 }
 
-func respondWithError(w http.ResponseWriter, status int, message string) error {
-	return respondWithJSON(w, status, map[string]string{"error": message})
+func RespondWithError(w http.ResponseWriter, status int, message string) error {
+	return RespondWithJSON(w, status, map[string]string{"error": message})
 }
