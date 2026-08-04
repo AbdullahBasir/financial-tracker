@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/AbdullahBasir/financial-tracker/internal/handler"
+	"github.com/AbdullahBasir/financial-tracker/internal/middleware"
 )
 
 func main() {
@@ -17,6 +18,8 @@ func main() {
 
 	router.HandleFunc("POST /auth/register", cfg.HandlerRegister)
 	router.HandleFunc("POST /auth/Login", cfg.HandlerLogin)
+
+	router.Handle("POST /accounts", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateAccount)))
 
 	serverStruct := &http.Server{
 		Addr:         ":8080",
