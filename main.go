@@ -20,6 +20,7 @@ func main() {
 	router.HandleFunc("POST /auth/Login", cfg.HandlerLogin)
 
 	router.Handle("POST /accounts", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateAccount)))
+	router.Handle("GET /accounts", middleware.Auth(http.HandlerFunc(cfg.HandlerGetAccounts)))
 
 	serverStruct := &http.Server{
 		Addr:         ":8080",

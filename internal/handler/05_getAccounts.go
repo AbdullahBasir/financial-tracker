@@ -1,0 +1,48 @@
+package handler
+
+import (
+	"fmt"
+	"net/http"
+	"sort"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+)
+
+func (cfg *apiConfig) HandlerGetAccounts(w http.ResponseWriter, r *http.Request) {
+	claims := r.Context().Value("claims").(*jwt.RegisteredClaims)
+	userID, err := uuid.Parse(claims.Subject)
+	if err != nil {
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not convert string to uuid format: %v", err))
+		return
+	}
+
+	accounts, err := cfg.dbQueries.GetAccounts(r.Context(), userID)
+	if err != nil {
+		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not retrieve accounts: %v", err))
+		return
+	}
+
+	responseBody := make([]Account, len(accounts))
+	for _, account := range accounts {
+		responseBody = append(responseBody, Account{
+			ID:              account.ID,
+			Name:            account.Name,
+			CreatedAt:       account.CreatedAt,
+			StartingBalance: account.StartingBalance,
+			Type:            account.Type,
+			UserID:          account.UserID,
+		})
+	}
+
+	sorting := r.URL.Query().Get("sort")
+	reverse := sorting == "desc"
+
+	sort.Slice(responseBody, func(i, j int) bool {
+		if reverse {
+			return responseBody[i].CreatedAt.After(responseBody[j].CreatedAt)
+		}
+		return responseBody[i].CreatedAt.Before(responseBody[j].CreatedAt)
+	})
+	RespondWithJSON(w, http.StatusOK, responseBody)
+}
