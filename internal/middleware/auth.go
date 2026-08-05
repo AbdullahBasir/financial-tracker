@@ -29,7 +29,12 @@ func Auth(next http.Handler) http.Handler {
 			return
 		}
 
-		claims := token.Claims.(*jwt.RegisteredClaims)
+		claims, ok := token.Claims.(*jwt.RegisteredClaims)
+		if !ok {
+			handler.RespondWithError(w, http.StatusInternalServerError, "invalid token claims")
+			return
+		}
+
 		ctx := context.WithValue(r.Context(), "claims", claims)
 		r = r.WithContext(ctx)
 

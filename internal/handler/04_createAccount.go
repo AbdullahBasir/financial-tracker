@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -19,10 +20,16 @@ func (cfg *apiConfig) HandlerCreateAccount(w http.ResponseWriter, r *http.Reques
 		UserID          uuid.UUID `json:"user_id"`
 	}
 
-	claims := r.Context().Value("claims").(*jwt.RegisteredClaims)
+	claims, ok := r.Context().Value("claims").(*jwt.RegisteredClaims)
+	if !ok || claims == nil {
+		RespondWithError(w, http.StatusUnauthorized, "invalid authentication")
+		return
+	}
+
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not convert string to uuid format: %v", err))
+		log.Printf("Error parsing user ID from token: %v", err)
+		RespondWithError(w, http.StatusUnauthorized, "invalid token subject")
 		return
 	}
 
