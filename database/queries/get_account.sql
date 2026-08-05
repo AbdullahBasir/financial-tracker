@@ -1,0 +1,3 @@
+-- name: GetAccount :one
+SELECT * FROM accounts
+WHERE id = $1;
