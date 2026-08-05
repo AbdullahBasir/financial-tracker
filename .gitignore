@@ -1,3 +1,11 @@
 out
 architecture.md
 .env
+.DS_Store
+
+# Bruno API Client (tests/bruno)
+tests/bruno/.env*
+tests/bruno/node_modules
+tests/bruno/.DS_Store
+tests/bruno/Thumbs.db
+tests/bruno/environments

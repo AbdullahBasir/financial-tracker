@@ -16,7 +16,7 @@ func Auth(next http.Handler) http.Handler {
 		cfg := handler.LoadConfig()
 		tokenString, err := auth.GetBearerToken(r.Header)
 		if err != nil {
-			handler.RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not access Bearer token: %v", err))
+			handler.RespondWithError(w, http.StatusUnauthorized, fmt.Sprintf("missing or invalid authorization header: %v", err))
 			return
 		}
 

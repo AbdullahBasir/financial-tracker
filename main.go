@@ -17,7 +17,7 @@ func main() {
 	router.HandleFunc("GET /health", handler.HandlerHealth)
 
 	router.HandleFunc("POST /auth/register", cfg.HandlerRegister)
-	router.HandleFunc("POST /auth/Login", cfg.HandlerLogin)
+	router.HandleFunc("POST /auth/login", cfg.HandlerLogin)
 
 	router.Handle("POST /accounts", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateAccount)))
 	router.Handle("GET /accounts", middleware.Auth(http.HandlerFunc(cfg.HandlerGetAccounts)))
