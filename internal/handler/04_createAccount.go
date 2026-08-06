@@ -14,10 +14,9 @@ import (
 
 func (cfg *apiConfig) HandlerCreateAccount(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name            string    `json:"name"`
-		StartingBalance string    `json:"starting_balance"`
-		Type            string    `json:"type"`
-		UserID          uuid.UUID `json:"user_id"`
+		Name            string `json:"name"`
+		StartingBalance string `json:"starting_balance"`
+		Type            string `json:"type"`
 	}
 
 	claims, ok := r.Context().Value("claims").(*jwt.RegisteredClaims)

@@ -30,7 +30,7 @@ func (cfg *apiConfig) HandlerGetAccounts(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	responseBody := make([]Account, len(accounts))
+	var responseBody []Account
 	for _, account := range accounts {
 		responseBody = append(responseBody, Account{
 			ID:              account.ID,
