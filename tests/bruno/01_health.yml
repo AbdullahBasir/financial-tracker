@@ -8,6 +8,15 @@ http:
   url: "{{baseUrl}}/health"
   auth: inherit
 
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        expect(res.status).to.equal(200);
+        expect(res.body).to.equal("OK");
+
+        console.log('Health check passed');
+
 settings:
   encodeUrl: true
   timeout: 0

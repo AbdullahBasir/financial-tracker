@@ -55,7 +55,7 @@ func (cfg *apiConfig) HandlerLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	RespondWithJSON(w, http.StatusCreated, responseBody{
+	RespondWithJSON(w, http.StatusOK, responseBody{
 		Id:        user.ID,
 		CreatedAt: user.CreatedAt,
 		Email:     user.Email,

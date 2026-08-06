@@ -13,10 +13,28 @@ http:
     type: json
     data: |-
       {
-        "email": "weare@example.com",
-        "password": "securePassword123"
+        "email": "officialtest@example.com",
+        "password": "testing123"
       }
   auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        const data = res.body;
+        const status = res.status;
+        const headers = res.headers;
+
+        expect(status).to.equal(201);
+        expect(res.headers['content-type']).to.include('application/json');
+
+        expect(data).to.have.property('id');
+        expect(data).to.have.property('email');
+        expect(data).to.have.property('created_at');
+        expect(data).to.not.have.property('password_hash')
+
+        console.log('Registeration successful');
 
 settings:
   encodeUrl: true
