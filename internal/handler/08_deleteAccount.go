@@ -1,10 +1,7 @@
 package handler
 
 import (
-	"log"
 	"net/http"
-
-	"github.com/google/uuid"
 )
 
 func (cfg *apiConfig) HandlerDeleteAccount(w http.ResponseWriter, r *http.Request) {
@@ -13,14 +10,13 @@ func (cfg *apiConfig) HandlerDeleteAccount(w http.ResponseWriter, r *http.Reques
 		RespondWithError(w, http.StatusBadRequest, "no id found in request path")
 		return
 	}
-	accountID, err := uuid.Parse(id)
-	if err != nil {
-		log.Printf("Error obtaining uuid value from string: %v", err)
-		RespondWithError(w, http.StatusBadRequest, "could not parse account ID")
+	account, validation := cfg.AccountValidation(id, r)
+	if validation != nil {
+		RespondWithError(w, validation.Code, validation.Message)
 		return
 	}
 
-	err = cfg.dbQueries.DeleteAccount(r.Context(), accountID)
+	err := cfg.dbQueries.DeleteAccount(r.Context(), account.ID)
 	if err != nil {
 		RespondWithError(w, http.StatusInternalServerError, "could not delete account")
 		return

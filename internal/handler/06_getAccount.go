@@ -1,10 +1,7 @@
 package handler
 
 import (
-	"log"
 	"net/http"
-
-	"github.com/google/uuid"
 )
 
 func (cfg *apiConfig) HandlerGetAccount(w http.ResponseWriter, r *http.Request) {
@@ -13,17 +10,9 @@ func (cfg *apiConfig) HandlerGetAccount(w http.ResponseWriter, r *http.Request) 
 		RespondWithError(w, http.StatusBadRequest, "no id found in request path")
 		return
 	}
-	accountID, err := uuid.Parse(id)
-	if err != nil {
-		log.Printf("Error obtaining uuid value from string: %v", err)
-		RespondWithError(w, http.StatusBadRequest, "could not parse account ID")
-		return
-	}
-
-	account, err := cfg.dbQueries.GetAccount(r.Context(), accountID)
-	if err != nil {
-		log.Printf("Error retrieving account with id: %v", err)
-		RespondWithError(w, http.StatusInternalServerError, "could not retrieve account")
+	account, validation := cfg.AccountValidation(id, r)
+	if validation != nil {
+		RespondWithError(w, validation.Code, validation.Message)
 		return
 	}
 

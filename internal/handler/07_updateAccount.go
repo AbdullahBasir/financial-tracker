@@ -11,9 +11,9 @@ import (
 
 func (cfg *apiConfig) HandlerUpdateAccount(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name            string `json:"name"`
-		StartingBalance string `json:"starting_balance"`
-		Type            string `json:"type"`
+		Name            *string `json:"name"`
+		StartingBalance *string `json:"starting_balance"`
+		Type            *string `json:"type"`
 	}
 
 	params := parameters{}
@@ -24,33 +24,56 @@ func (cfg *apiConfig) HandlerUpdateAccount(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	id := r.PathValue("id")
+	if len(id) < 1 {
+		RespondWithError(w, http.StatusBadRequest, "no id found in request path")
+		return
+	}
+	checkAccount, validation := cfg.AccountValidation(id, r)
+	if validation != nil {
+		RespondWithError(w, validation.Code, validation.Message)
+		return
+	}
+
 	validTypes := map[string]bool{
 		"checking": true,
 		"savings":  true,
 		"credit":   true,
 	}
-	if !validTypes[params.Type] {
+	if !validTypes[*params.Type] {
 		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("invalid account type: %v", err))
 		return
 	}
 
-	_, err = strconv.ParseFloat(params.StartingBalance, 64)
-	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("invalid starting_balance format: %v", err))
-		return
+	updateParams := sqlc.UpdateAccountParams{
+		ID:              checkAccount.ID,
+		Name:            checkAccount.Name,
+		StartingBalance: checkAccount.StartingBalance,
+		Type:            checkAccount.Type,
 	}
 
-	account, err := cfg.dbQueries.UpdateAccount(r.Context(), sqlc.UpdateAccountParams{
-		Name:            params.Name,
-		StartingBalance: params.StartingBalance,
-		Type:            params.Type,
-	})
+	if params.Name != nil {
+		updateParams.Name = *params.Name
+	}
+	if params.Type != nil {
+		updateParams.Type = *params.Type
+	}
+	if params.StartingBalance != nil {
+		_, err := strconv.ParseFloat(*params.StartingBalance, 64)
+		if err != nil {
+			RespondWithError(w, http.StatusBadRequest, "invalid starting_balance format")
+			return
+		}
+		updateParams.StartingBalance = *params.StartingBalance
+	}
+
+	account, err := cfg.dbQueries.UpdateAccount(r.Context(), updateParams)
 	if err != nil {
 		RespondWithError(w, http.StatusInternalServerError, "could not update account")
 		return
 	}
 
-	RespondWithJSON(w, http.StatusCreated, Account{
+	RespondWithJSON(w, http.StatusOK, Account{
 		ID:              account.ID,
 		Name:            account.Name,
 		CreatedAt:       account.CreatedAt,
