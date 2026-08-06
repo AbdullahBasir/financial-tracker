@@ -1,0 +1,26 @@
+info:
+  name: 08_deleteAccount
+  type: http
+  seq: 8
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/accounts/{{accountId}}"
+  headers:
+    - name: Authorization
+      value: Bearer {{auth_token}}
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        expect(res.status).to.equal(204);
+
+        console.log('Account deleted');
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

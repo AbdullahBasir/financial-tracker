@@ -1,21 +1,16 @@
 info:
-  name: 03_login
+  name: 06_getAccount
   type: http
-  seq: 3
+  seq: 6
 
 http:
-  method: POST
-  url: "{{baseUrl}}/auth/login"
+  method: GET
+  url: "{{baseUrl}}/accounts/{{accountId}}"
   headers:
+    - name: Authorization
+      value: Bearer {{auth_token}}
     - name: Content-Type
       value: application/json
-  body:
-    type: json
-    data: |-
-      {
-        "email": "timber@example.com",
-        "password": "timber101"
-      }
   auth: inherit
 
 runtime:
@@ -30,13 +25,13 @@ runtime:
         expect(res.headers['content-type']).to.include('application/json');
 
         expect(data).to.have.property('id');
-        expect(data).to.have.property('email');
+        expect(data).to.have.property('name');
         expect(data).to.have.property('created_at');
-        expect(data).to.have.property('token')
+        expect(data).to.have.property('starting_balance')
+        expect(data).to.have.property('type')
+        expect(data).to.have.property('user_id')
 
-        bru.setEnvVar("auth_token", data.token);
-
-        console.log('Login successful');
+        console.log('Account retrieval successful');
 
 settings:
   encodeUrl: true

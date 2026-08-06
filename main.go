@@ -21,6 +21,7 @@ func main() {
 
 	router.Handle("POST /accounts", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateAccount)))
 	router.Handle("GET /accounts", middleware.Auth(http.HandlerFunc(cfg.HandlerGetAccounts)))
+	router.Handle("GET /accounts/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerGetAccount)))
 	router.Handle("PATCH /accounts/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerUpdateAccount)))
 	router.Handle("DELETE /accounts/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerDeleteAccount)))
 
