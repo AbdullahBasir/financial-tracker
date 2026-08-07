@@ -40,16 +40,6 @@ func (cfg *apiConfig) HandlerCreateAccount(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	validTypes := map[string]bool{
-		"checking": true,
-		"savings":  true,
-		"credit":   true,
-	}
-	if !validTypes[params.Type] {
-		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("invalid account type: %v", err))
-		return
-	}
-
 	_, err = strconv.ParseFloat(params.StartingBalance, 64)
 	if err != nil {
 		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("invalid starting_balance format: %v", err))

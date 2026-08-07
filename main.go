@@ -25,6 +25,8 @@ func main() {
 	router.Handle("PATCH /accounts/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerUpdateAccount)))
 	router.Handle("DELETE /accounts/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerDeleteAccount)))
 
+	router.Handle("POST /categories", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateCategory)))
+
 	serverStruct := &http.Server{
 		Addr:         ":8080",
 		Handler:      router,

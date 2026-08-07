@@ -21,3 +21,11 @@ type Account struct {
 	Type            string    `json:"type"`
 	UserID          uuid.UUID `json:"user_id"`
 }
+
+type Category struct {
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	Type      string    `json:"type"`
+	UserID    uuid.UUID `json:"user_id"`
+}

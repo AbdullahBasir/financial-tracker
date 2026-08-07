@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -32,16 +31,6 @@ func (cfg *apiConfig) HandlerUpdateAccount(w http.ResponseWriter, r *http.Reques
 	checkAccount, validation := cfg.AccountValidation(id, r)
 	if validation != nil {
 		RespondWithError(w, validation.Code, validation.Message)
-		return
-	}
-
-	validTypes := map[string]bool{
-		"checking": true,
-		"savings":  true,
-		"credit":   true,
-	}
-	if !validTypes[*params.Type] {
-		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("invalid account type: %v", err))
 		return
 	}
 
