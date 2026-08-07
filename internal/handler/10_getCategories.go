@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -9,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (cfg *apiConfig) HandlerGetAccounts(w http.ResponseWriter, r *http.Request) {
+func (cfg *apiConfig) HandlerGetCategories(w http.ResponseWriter, r *http.Request) {
 	claims, ok := r.Context().Value("claims").(*jwt.RegisteredClaims)
 	if !ok || claims == nil {
 		RespondWithError(w, http.StatusUnauthorized, "invalid authentication")
@@ -23,21 +22,20 @@ func (cfg *apiConfig) HandlerGetAccounts(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	accounts, err := cfg.dbQueries.GetAccounts(r.Context(), userID)
+	categories, err := cfg.dbQueries.GetCategories(r.Context(), userID)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not retrieve accounts: %v", err))
+		RespondWithError(w, http.StatusInternalServerError, "could not retrieve categories")
 		return
 	}
 
 	var responseBody []Account
-	for _, account := range accounts {
+	for _, category := range categories {
 		responseBody = append(responseBody, Account{
-			ID:              account.ID,
-			Name:            account.Name,
-			CreatedAt:       account.CreatedAt,
-			StartingBalance: account.StartingBalance,
-			Type:            account.Type,
-			UserID:          account.UserID,
+			ID:        category.ID,
+			Name:      category.Name,
+			CreatedAt: category.CreatedAt,
+			Type:      category.Type,
+			UserID:    category.UserID,
 		})
 	}
 	RespondWithJSON(w, http.StatusOK, responseBody)
