@@ -28,6 +28,8 @@ func main() {
 	router.Handle("POST /categories", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateCategory)))
 	router.Handle("GET /categories", middleware.Auth(http.HandlerFunc(cfg.HandlerGetCategories)))
 
+	router.Handle("GET /transactions", middleware.Auth(http.HandlerFunc(cfg.HandlerGetTransactions)))
+
 	serverStruct := &http.Server{
 		Addr:         ":8080",
 		Handler:      router,

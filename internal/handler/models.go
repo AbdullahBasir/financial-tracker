@@ -29,3 +29,13 @@ type Category struct {
 	Type      string    `json:"type"`
 	UserID    uuid.UUID `json:"user_id"`
 }
+
+type Transaction struct {
+	ID          uuid.UUID `json:"id"`
+	Amount      string    `json:"amount"`
+	CreatedAt   time.Time `json:"created_at"`
+	OccurredAt  time.Time `json:"occured_at"`
+	Description string    `json:"description"`
+	AccountID   uuid.UUID `json:"account_id"`
+	CategoryID  uuid.UUID `json:"category_id"`
+}
