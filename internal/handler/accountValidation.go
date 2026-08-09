@@ -8,11 +8,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type ValidationError struct {
-	Code    int
-	Message string
-}
-
 func (cfg *apiConfig) AccountValidation(id string, r *http.Request) (sqlc.Account, *ValidationError) {
 	accountID, err := uuid.Parse(id)
 	if err != nil {
