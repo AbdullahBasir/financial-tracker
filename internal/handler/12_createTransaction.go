@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
@@ -31,6 +32,11 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 
 	if params.Amount == "" {
 		RespondWithError(w, http.StatusBadRequest, "amount is required")
+		return
+	}
+	_, err = strconv.ParseFloat(params.Amount, 64)
+	if err != nil {
+		RespondWithError(w, http.StatusBadRequest, "invalid amount format")
 		return
 	}
 

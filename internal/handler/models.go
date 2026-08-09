@@ -6,6 +6,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type ValidationError struct {
+	Code    int
+	Message string
+}
+
 type User struct {
 	ID           uuid.UUID `json:"id"`
 	Email        string    `json:"email"`

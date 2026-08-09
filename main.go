@@ -31,6 +31,7 @@ func main() {
 	router.Handle("GET /transactions", middleware.Auth(http.HandlerFunc(cfg.HandlerGetTransactions)))
 	router.Handle("POST /transactions", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateTransaction)))
 	router.Handle("GET /transactions/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerGetTransaction)))
+	router.Handle("PATCH /transactions/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerUpdateTransaction)))
 
 	serverStruct := &http.Server{
 		Addr:         ":8080",
