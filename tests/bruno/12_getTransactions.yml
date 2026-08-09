@@ -1,0 +1,55 @@
+info:
+  name: 12_getTransactions
+  type: http
+  seq: 12
+
+http:
+  method: GET
+  url: "{{baseUrl}}/transactions?account_id={{accountId}}"
+  headers:
+    - name: Authorization
+      value: Bearer {{auth_token}}
+    - name: Content-Type
+      value: application/json
+  params:
+    - name: account_id
+      value: "{{accountId}}"
+      type: query
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        const data = res.body;
+        const status = res.status;
+        const headers = res.headers;
+
+        expect(status).to.equal(200);
+        expect(res.headers['content-type']).to.include('application/json');
+
+        expect(data).to.be.an('object');
+        expect(data).to.have.property('page');
+        expect(data).to.have.property('page_size');
+        expect(data).to.have.property('transactions');
+
+        expect(data.transactions).to.be.an('array');
+        expect(data.transactions.length).to.be.greaterThan(0);
+
+        data.transactions.forEach((transaction, index) => {
+          expect(transaction).to.have.property('id');
+          expect(transaction).to.have.property('amount');
+          expect(transaction).to.have.property('created_at');
+          expect(transaction).to.have.property('occurred_at');
+          expect(transaction).to.have.property('description');
+          expect(transaction).to.have.property('account_id');
+          expect(transaction).to.have.property('category_id');
+        });
+
+        console.log(`Transaction retrieval successful - ${data.data.length} transactions found`);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

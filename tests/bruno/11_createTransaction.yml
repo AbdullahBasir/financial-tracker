@@ -1,11 +1,11 @@
 info:
-  name: 09_createCategory
+  name: 11_createTransaction
   type: http
-  seq: 9
+  seq: 11
 
 http:
   method: POST
-  url: "{{baseUrl}}/categories"
+  url: "{{baseUrl}}/transactions"
   headers:
     - name: Authorization
       value: Bearer {{auth_token}}
@@ -15,8 +15,11 @@ http:
     type: json
     data: |-
       {
-        "name": "work",
-        "type": "income"
+        "amount": "50.00",
+        "occurred_at": "2026-08-09T14:57:00Z",
+        "description": "Nesto",
+        "account_id": "{{accountId}}",
+        "category_id": "{{categoryId}}"
       }
   auth: inherit
 
@@ -32,12 +35,14 @@ runtime:
         expect(res.headers['content-type']).to.include('application/json');
 
         expect(data).to.have.property('id');
-        expect(data).to.have.property('name');
+        expect(data).to.have.property('amount');
         expect(data).to.have.property('created_at');
-        expect(data).to.have.property('type');
-        expect(category).to.have.property('user_id');
+        expect(data).to.have.property('occured_at');
+        expect(data).to.have.property('description');
+        expect(data).to.have.property('account_id');
+        expect(data).to.have.property('category_id');
 
-        console.log('Category creation successful');
+        console.log('Transaction creation successful');
 
 settings:
   encodeUrl: true

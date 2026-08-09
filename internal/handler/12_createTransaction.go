@@ -45,7 +45,7 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if params.OccurredAt.After(time.Now()) {
+	if params.OccurredAt.After(time.Now().UTC()) {
 		RespondWithError(w, http.StatusBadRequest, "transaction cannot be in the future")
 		return
 	}
