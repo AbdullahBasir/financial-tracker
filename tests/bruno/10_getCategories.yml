@@ -1,0 +1,44 @@
+info:
+  name: 10_getCategories
+  type: http
+  seq: 10
+
+http:
+  method: GET
+  url: "{{baseUrl}}/categories"
+  headers:
+    - name: Authorization
+      value: Bearer {{auth_token}}
+    - name: Content-Type
+      value: application/json
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        const data = res.body;
+        const status = res.status;
+        const headers = res.headers;
+
+        expect(status).to.equal(200);
+        expect(res.headers['content-type']).to.include('application/json');
+
+        expect(data).to.be.an('array');
+        expect(data.length).to.be.greaterThan(0);
+
+        data.forEach((category, index) => {
+          expect(category).to.have.property('id');
+          expect(category).to.have.property('name');
+          expect(category).to.have.property('created_at');
+          expect(category).to.have.property('type');
+          expect(category).to.have.property('user_id');
+        });
+
+        console.log(`Category retrieval successful - ${data.length} categories found`);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

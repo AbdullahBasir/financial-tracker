@@ -28,9 +28,9 @@ func (cfg *apiConfig) HandlerGetCategories(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var responseBody []Account
+	var responseBody []Category
 	for _, category := range categories {
-		responseBody = append(responseBody, Account{
+		responseBody = append(responseBody, Category{
 			ID:        category.ID,
 			Name:      category.Name,
 			CreatedAt: category.CreatedAt,
