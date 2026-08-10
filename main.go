@@ -34,6 +34,8 @@ func main() {
 	router.Handle("PATCH /transactions/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerUpdateTransaction)))
 	router.Handle("DELETE /transactions/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerDeleteTransaction)))
 
+	router.Handle("POST /budgets", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateBudget)))
+
 	serverStruct := &http.Server{
 		Addr:         ":8080",
 		Handler:      router,

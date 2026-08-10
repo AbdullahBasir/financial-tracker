@@ -44,3 +44,12 @@ type Transaction struct {
 	AccountID   uuid.UUID `json:"account_id"`
 	CategoryID  uuid.UUID `json:"category_id"`
 }
+
+type Budget struct {
+	ID           uuid.UUID `json:"id"`
+	CreatedAt    time.Time `json:"created_at"`
+	MonthlyLimit string    `json:"monthly_limit"`
+	Month        string    `json:"month"`
+	UserID       uuid.UUID `json:"user_id"`
+	CategoryID   uuid.UUID `json:"category_id"`
+}
