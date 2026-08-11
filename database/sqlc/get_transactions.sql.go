@@ -14,7 +14,7 @@ import (
 const getTransactions = `-- name: GetTransactions :many
 SELECT id, amount, created_at, occurred_at, description, account_id, category_id FROM transactions 
 WHERE account_id = $1
-ORDER BY occurred_at DESC
+ORDER BY occurred_at ASC
 LIMIT $2 OFFSET $3
 `
 

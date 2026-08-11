@@ -15,7 +15,8 @@ http:
     type: json
     data: |-
       {
-        "amount": "500.50",
+        "amount": "500.550",
+        "occurred_at": "2026-08-07T10:00:00Z"
         "account_id": "{{accountId}}",
         "category_id": "{{categoryId}}"
       }
