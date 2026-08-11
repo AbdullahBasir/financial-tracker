@@ -1,0 +1,68 @@
+package handler
+
+import (
+	"context"
+	"time"
+
+	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
+	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
+)
+
+func (cfg *apiConfig) GetBudgetSummary(ctx context.Context, userID uuid.UUID, month string) (BudgetSummaryResponse, error) {
+	budgets, err := cfg.dbQueries.GetBudgetsForMonth(ctx, sqlc.GetBudgetsForMonthParams{
+		UserID: userID,
+		Month:  month,
+	})
+	if err != nil {
+		return BudgetSummaryResponse{}, err
+	}
+
+	occurredAt, err := time.Parse("2006-01", month)
+	if err != nil {
+		return BudgetSummaryResponse{}, err
+	}
+
+	spending, err := cfg.dbQueries.GetMonthlySpending(ctx, sqlc.GetMonthlySpendingParams{
+		UserID:     userID,
+		OccurredAt: occurredAt,
+	})
+	if err != nil {
+		return BudgetSummaryResponse{}, err
+	}
+
+	spendingMap := make(map[uuid.UUID]decimal.Decimal)
+	for _, spent := range spending {
+		spendingMap[spent.CategoryID] = decimal.NewFromInt(spent.TotalSpent)
+	}
+
+	summary := BudgetSummaryResponse{
+		Month: month,
+		Items: make([]BudgetSummaryItem, 0, len(budgets)),
+	}
+
+	for _, budget := range budgets {
+		category, err := cfg.dbQueries.GetCategory(ctx, budget.CategoryID)
+		if err != nil {
+			return BudgetSummaryResponse{}, err
+		}
+		spent := spendingMap[budget.CategoryID]
+		remaining := budget.MonthlyLimit.Sub(spent)
+
+		item := BudgetSummaryItem{
+			CategoryID:   budget.CategoryID,
+			CategoryName: category.Name,
+			MonthlyLimit: budget.MonthlyLimit,
+			TotalSpent:   spent,
+			Remaining:    remaining,
+			IsOverBudget: spent.GreaterThan(budget.MonthlyLimit),
+		}
+
+		summary.Items = append(summary.Items, item)
+		summary.TotalBudget = summary.TotalBudget.Add(budget.MonthlyLimit)
+		summary.TotalSpent = summary.TotalSpent.Add(spent)
+	}
+
+	summary.TotalRemaining = summary.TotalBudget.Sub(summary.TotalSpent)
+	return summary, nil
+}

@@ -36,6 +36,7 @@ func main() {
 
 	router.Handle("POST /budgets", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateBudget)))
 	router.Handle("GET /budgets", middleware.Auth(http.HandlerFunc(cfg.HandlerGetBudgets)))
+	router.Handle("GET /budgets/summary", middleware.Auth(http.HandlerFunc(cfg.HandlerGetSumBudgets)))
 
 	serverStruct := &http.Server{
 		Addr:         ":8080",

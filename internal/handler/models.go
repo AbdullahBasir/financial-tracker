@@ -54,3 +54,20 @@ type Budget struct {
 	UserID       uuid.UUID       `json:"user_id"`
 	CategoryID   uuid.UUID       `json:"category_id"`
 }
+
+type BudgetSummaryItem struct {
+	CategoryID   uuid.UUID       `json:"category_id"`
+	CategoryName string          `json:"category_name"`
+	MonthlyLimit decimal.Decimal `json:"monthly_limit"`
+	TotalSpent   decimal.Decimal `json:"total_spent"`
+	Remaining    decimal.Decimal `json:"remaining"`
+	IsOverBudget bool            `json:"is_over_budget"`
+}
+
+type BudgetSummaryResponse struct {
+	Month          string              `json:"month"`
+	Items          []BudgetSummaryItem `json:"items"`
+	TotalBudget    decimal.Decimal     `json:"total_budget"`
+	TotalSpent     decimal.Decimal     `json:"total_spent"`
+	TotalRemaining decimal.Decimal     `json:"total_remaining"`
+}
