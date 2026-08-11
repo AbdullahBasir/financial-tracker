@@ -6,4 +6,5 @@ FROM transactions t
 JOIN accounts a ON a.id = t.account_id
 WHERE a.user_id = $1
 AND TO_CHAR(t.occurred_at, 'YYYY-MM') = $2::text
+AND c.type = 'expenses'
 GROUP BY t.category_id;

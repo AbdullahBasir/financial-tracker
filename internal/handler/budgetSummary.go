@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
 	"github.com/google/uuid"
@@ -31,8 +32,10 @@ func (cfg *apiConfig) GetBudgetSummary(ctx context.Context, userID uuid.UUID, mo
 	}
 
 	summary := BudgetSummaryResponse{
-		Month: month,
-		Items: make([]BudgetSummaryItem, 0, len(budgets)),
+		Month:       month,
+		Items:       make([]BudgetSummaryItem, 0, len(budgets)),
+		TotalBudget: decimal.Zero,
+		TotalSpent:  decimal.Zero,
 	}
 
 	for _, budget := range budgets {
@@ -40,7 +43,16 @@ func (cfg *apiConfig) GetBudgetSummary(ctx context.Context, userID uuid.UUID, mo
 		if err != nil {
 			return BudgetSummaryResponse{}, err
 		}
-		spent := spendingMap[budget.CategoryID]
+
+		if category.Type != "expenses" {
+			return BudgetSummaryResponse{}, fmt.Errorf("budgets can only be created for expenses categories")
+		}
+
+		spent, ok := spendingMap[budget.CategoryID]
+		if !ok {
+			spent = decimal.Zero
+		}
+
 		remaining := budget.MonthlyLimit.Sub(spent)
 
 		item := BudgetSummaryItem{

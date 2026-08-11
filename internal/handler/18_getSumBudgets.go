@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -26,8 +27,8 @@ func (cfg *apiConfig) HandlerGetSumBudgets(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if len(month) != 7 {
-		RespondWithError(w, http.StatusBadRequest, "invalid month format, use YYYY-MM")
+	if _, err := time.Parse("2006-01", month); err != nil {
+		RespondWithError(w, http.StatusBadRequest, "month must be in YYYY-MM format")
 		return
 	}
 
