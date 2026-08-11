@@ -7,34 +7,34 @@ package sqlc
 
 import (
 	"context"
-	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const getMonthlySpending = `-- name: GetMonthlySpending :many
 SELECT 
     t.category_id,
-    SUM(t.amount) AS total_spent
+    SUM(t.amount)::numeric AS total_spent
 FROM transactions t
 JOIN accounts a ON a.id = t.account_id
 WHERE a.user_id = $1
-AND TO_CHAR(t.occurred_at, 'YYYY-MM') = $2
+AND TO_CHAR(t.occurred_at, 'YYYY-MM') = $2::text
 GROUP BY t.category_id
 `
 
 type GetMonthlySpendingParams struct {
-	UserID     uuid.UUID
-	OccurredAt time.Time
+	UserID  uuid.UUID
+	Column2 string
 }
 
 type GetMonthlySpendingRow struct {
 	CategoryID uuid.UUID
-	TotalSpent int64
+	TotalSpent decimal.Decimal
 }
 
 func (q *Queries) GetMonthlySpending(ctx context.Context, arg GetMonthlySpendingParams) ([]GetMonthlySpendingRow, error) {
-	rows, err := q.db.QueryContext(ctx, getMonthlySpending, arg.UserID, arg.OccurredAt)
+	rows, err := q.db.QueryContext(ctx, getMonthlySpending, arg.UserID, arg.Column2)
 	if err != nil {
 		return nil, err
 	}

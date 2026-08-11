@@ -1,11 +1,11 @@
 info:
-  name: 06_getAccount
+  name: 13_getTransaction
   type: http
-  seq: 6
+  seq: 13
 
 http:
   method: GET
-  url: "{{baseUrl}}/accounts/{{accountId}}"
+  url: "{{baseUrl}}/transactions/{{transactionId}}"
   headers:
     - name: Authorization
       value: Bearer {{auth_token}}
@@ -25,13 +25,14 @@ runtime:
         expect(res.headers['content-type']).to.include('application/json');
 
         expect(data).to.have.property('id');
-        expect(data).to.have.property('name');
+        expect(data).to.have.property('amount');
         expect(data).to.have.property('created_at');
-        expect(data).to.have.property('starting_balance');
-        expect(data).to.have.property('type');
-        expect(data).to.have.property('user_id');
+        expect(data).to.have.property('occurred_at');
+        expect(data).to.have.property('description');
+        expect(data).to.have.property('account_id');
+        expect(data).to.have.property('category_id');
 
-        console.log('Account retrieval successful');
+        console.log('Transaction retrieval successful');
 
 settings:
   encodeUrl: true

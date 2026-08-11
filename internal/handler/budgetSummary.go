@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"time"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
 	"github.com/google/uuid"
@@ -18,14 +17,9 @@ func (cfg *apiConfig) GetBudgetSummary(ctx context.Context, userID uuid.UUID, mo
 		return BudgetSummaryResponse{}, err
 	}
 
-	occurredAt, err := time.Parse("2006-01", month)
-	if err != nil {
-		return BudgetSummaryResponse{}, err
-	}
-
 	spending, err := cfg.dbQueries.GetMonthlySpending(ctx, sqlc.GetMonthlySpendingParams{
-		UserID:     userID,
-		OccurredAt: occurredAt,
+		UserID:  userID,
+		Column2: month,
 	})
 	if err != nil {
 		return BudgetSummaryResponse{}, err
@@ -33,7 +27,7 @@ func (cfg *apiConfig) GetBudgetSummary(ctx context.Context, userID uuid.UUID, mo
 
 	spendingMap := make(map[uuid.UUID]decimal.Decimal)
 	for _, spent := range spending {
-		spendingMap[spent.CategoryID] = decimal.NewFromInt(spent.TotalSpent)
+		spendingMap[spent.CategoryID] = spent.TotalSpent
 	}
 
 	summary := BudgetSummaryResponse{

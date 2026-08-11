@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -32,6 +33,7 @@ func (cfg *apiConfig) HandlerGetSumBudgets(w http.ResponseWriter, r *http.Reques
 
 	summary, err := cfg.GetBudgetSummary(r.Context(), userID, month)
 	if err != nil {
+		log.Printf("Error: %v", err)
 		RespondWithError(w, http.StatusInternalServerError, "failed to fetch budget summary")
 		return
 	}

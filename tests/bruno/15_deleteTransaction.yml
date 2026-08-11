@@ -1,0 +1,26 @@
+info:
+  name: 15_deleteTransaction
+  type: http
+  seq: 15
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/transactions/{{transactionId}}"
+  headers:
+    - name: Authorization
+      value: Bearer {{auth_token}}
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        expect(res.status).to.equal(204);
+
+        console.log('Transaction deleted');
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
