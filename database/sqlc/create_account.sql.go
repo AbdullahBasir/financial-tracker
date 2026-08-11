@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const createAccount = `-- name: CreateAccount :one
@@ -25,7 +26,7 @@ RETURNING id, name, created_at, starting_balance, type, user_id
 
 type CreateAccountParams struct {
 	Name            string
-	StartingBalance string
+	StartingBalance decimal.Decimal
 	Type            string
 	UserID          uuid.UUID
 }

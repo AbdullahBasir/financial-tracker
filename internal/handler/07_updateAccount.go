@@ -3,16 +3,16 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
+	"github.com/shopspring/decimal"
 )
 
 func (cfg *apiConfig) HandlerUpdateAccount(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name            *string `json:"name"`
-		StartingBalance *string `json:"starting_balance"`
-		Type            *string `json:"type"`
+		Name            *string          `json:"name"`
+		StartingBalance *decimal.Decimal `json:"starting_balance"`
+		Type            *string          `json:"type"`
 	}
 
 	params := parameters{}
@@ -48,11 +48,6 @@ func (cfg *apiConfig) HandlerUpdateAccount(w http.ResponseWriter, r *http.Reques
 		updateParams.Type = *params.Type
 	}
 	if params.StartingBalance != nil {
-		_, err := strconv.ParseFloat(*params.StartingBalance, 64)
-		if err != nil {
-			RespondWithError(w, http.StatusBadRequest, "invalid starting_balance format")
-			return
-		}
 		updateParams.StartingBalance = *params.StartingBalance
 	}
 

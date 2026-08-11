@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const updateAccount = `-- name: UpdateAccount :one
@@ -20,7 +21,7 @@ RETURNING id, name, created_at, starting_balance, type, user_id
 
 type UpdateAccountParams struct {
 	Name            string
-	StartingBalance string
+	StartingBalance decimal.Decimal
 	Type            string
 	ID              uuid.UUID
 }

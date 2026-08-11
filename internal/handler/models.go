@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type ValidationError struct {
@@ -19,12 +20,12 @@ type User struct {
 }
 
 type Account struct {
-	ID              uuid.UUID `json:"id"`
-	Name            string    `json:"name"`
-	CreatedAt       time.Time `json:"created_at"`
-	StartingBalance string    `json:"starting_balance"`
-	Type            string    `json:"type"`
-	UserID          uuid.UUID `json:"user_id"`
+	ID              uuid.UUID       `json:"id"`
+	Name            string          `json:"name"`
+	CreatedAt       time.Time       `json:"created_at"`
+	StartingBalance decimal.Decimal `json:"starting_balance"`
+	Type            string          `json:"type"`
+	UserID          uuid.UUID       `json:"user_id"`
 }
 
 type Category struct {
@@ -36,20 +37,20 @@ type Category struct {
 }
 
 type Transaction struct {
-	ID          uuid.UUID `json:"id"`
-	Amount      string    `json:"amount"`
-	CreatedAt   time.Time `json:"created_at"`
-	OccurredAt  time.Time `json:"occurred_at"`
-	Description string    `json:"description"`
-	AccountID   uuid.UUID `json:"account_id"`
-	CategoryID  uuid.UUID `json:"category_id"`
+	ID          uuid.UUID       `json:"id"`
+	Amount      decimal.Decimal `json:"amount"`
+	CreatedAt   time.Time       `json:"created_at"`
+	OccurredAt  time.Time       `json:"occurred_at"`
+	Description string          `json:"description"`
+	AccountID   uuid.UUID       `json:"account_id"`
+	CategoryID  uuid.UUID       `json:"category_id"`
 }
 
 type Budget struct {
-	ID           uuid.UUID `json:"id"`
-	CreatedAt    time.Time `json:"created_at"`
-	MonthlyLimit string    `json:"monthly_limit"`
-	Month        string    `json:"month"`
-	UserID       uuid.UUID `json:"user_id"`
-	CategoryID   uuid.UUID `json:"category_id"`
+	ID           uuid.UUID       `json:"id"`
+	CreatedAt    time.Time       `json:"created_at"`
+	MonthlyLimit decimal.Decimal `json:"monthly_limit"`
+	Month        string          `json:"month"`
+	UserID       uuid.UUID       `json:"user_id"`
+	CategoryID   uuid.UUID       `json:"category_id"`
 }

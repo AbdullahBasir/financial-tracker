@@ -5,21 +5,21 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Amount      string    `json:"amount"`
-		OccurredAt  time.Time `json:"occurred_at"`
-		Description *string   `json:"description"`
-		AccountID   string    `json:"account_id"`
-		CategoryID  string    `json:"category_id"`
+		Amount      decimal.Decimal `json:"amount"`
+		OccurredAt  time.Time       `json:"occurred_at"`
+		Description *string         `json:"description"`
+		AccountID   string          `json:"account_id"`
+		CategoryID  string          `json:"category_id"`
 	}
 
 	params := parameters{}
@@ -30,13 +30,8 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	if params.Amount == "" {
+	if params.Amount.IsZero() {
 		RespondWithError(w, http.StatusBadRequest, "amount is required")
-		return
-	}
-	_, err = strconv.ParseFloat(params.Amount, 64)
-	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, "invalid amount format")
 		return
 	}
 

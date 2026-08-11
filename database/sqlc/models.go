@@ -9,13 +9,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type Account struct {
 	ID              uuid.UUID
 	Name            string
 	CreatedAt       time.Time
-	StartingBalance string
+	StartingBalance decimal.Decimal
 	Type            string
 	UserID          uuid.UUID
 }
@@ -23,7 +24,7 @@ type Account struct {
 type Budget struct {
 	ID           uuid.UUID
 	CreatedAt    time.Time
-	MonthlyLimit string
+	MonthlyLimit decimal.Decimal
 	Month        string
 	UserID       uuid.UUID
 	CategoryID   uuid.UUID
@@ -39,7 +40,7 @@ type Category struct {
 
 type Transaction struct {
 	ID          uuid.UUID
-	Amount      string
+	Amount      decimal.Decimal
 	CreatedAt   time.Time
 	OccurredAt  time.Time
 	Description sql.NullString

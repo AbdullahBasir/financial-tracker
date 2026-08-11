@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const updateTransaction = `-- name: UpdateTransaction :one
@@ -21,7 +22,7 @@ RETURNING id, amount, created_at, occurred_at, description, account_id, category
 `
 
 type UpdateTransactionParams struct {
-	Amount      string
+	Amount      decimal.Decimal
 	OccurredAt  time.Time
 	Description sql.NullString
 	AccountID   uuid.UUID

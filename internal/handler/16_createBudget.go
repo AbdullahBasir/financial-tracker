@@ -8,13 +8,14 @@ import (
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 func (cfg *apiConfig) HandlerCreateBudget(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		MonthlyLimit string `json:"monthly_limit"`
-		Month        string `json:"month"`
-		CategoryID   string `json:"category_id"`
+		MonthlyLimit decimal.Decimal `json:"monthly_limit"`
+		Month        string          `json:"month"`
+		CategoryID   string          `json:"category_id"`
 	}
 
 	params := parameters{}

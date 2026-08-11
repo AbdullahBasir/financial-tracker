@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 func (cfg *apiConfig) HandlerCreateAccount(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name            string `json:"name"`
-		StartingBalance string `json:"starting_balance"`
-		Type            string `json:"type"`
+		Name            string          `json:"name"`
+		StartingBalance decimal.Decimal `json:"starting_balance"`
+		Type            string          `json:"type"`
 	}
 
 	claims, ok := r.Context().Value("claims").(*jwt.RegisteredClaims)
@@ -37,12 +37,6 @@ func (cfg *apiConfig) HandlerCreateAccount(w http.ResponseWriter, r *http.Reques
 	err = decoder.Decode(&params)
 	if err != nil {
 		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("could not access request body: %v", err))
-		return
-	}
-
-	_, err = strconv.ParseFloat(params.StartingBalance, 64)
-	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("invalid starting_balance format: %v", err))
 		return
 	}
 

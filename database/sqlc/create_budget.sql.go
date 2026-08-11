@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const createBudget = `-- name: CreateBudget :one
@@ -24,7 +25,7 @@ RETURNING id, created_at, monthly_limit, month, user_id, category_id
 `
 
 type CreateBudgetParams struct {
-	MonthlyLimit string
+	MonthlyLimit decimal.Decimal
 	Month        string
 	UserID       uuid.UUID
 	CategoryID   uuid.UUID
