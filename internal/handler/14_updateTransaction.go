@@ -3,6 +3,7 @@ package handler
 import (
 	"database/sql"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -84,6 +85,10 @@ func (cfg *apiConfig) HandlerUpdateTransaction(w http.ResponseWriter, r *http.Re
 
 	updated, err := cfg.dbQueries.UpdateTransaction(r.Context(), updateParams)
 	if err != nil {
+		slog.Error("failed to retrieve budgets from database",
+			"error", err,
+			"transaction_id", updateParams.ID,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not update transaction")
 		return
 	}

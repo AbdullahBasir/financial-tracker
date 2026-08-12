@@ -1,6 +1,9 @@
 package handler
 
-import "net/http"
+import (
+	"log/slog"
+	"net/http"
+)
 
 func (cfg *apiConfig) HandlerDeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
@@ -17,6 +20,10 @@ func (cfg *apiConfig) HandlerDeleteTransaction(w http.ResponseWriter, r *http.Re
 
 	err := cfg.dbQueries.DeleteTransaction(r.Context(), transaction.ID)
 	if err != nil {
+		slog.Error("failed to delete transaction from database",
+			"error", err,
+			"transaction_id", transaction.ID,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not delete transaction")
 		return
 	}

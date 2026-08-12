@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
 	"github.com/google/uuid"
@@ -15,6 +16,10 @@ func (cfg *apiConfig) GetBudgetSummary(ctx context.Context, userID uuid.UUID, mo
 		Month:  month,
 	})
 	if err != nil {
+		slog.Error("failed to retrieve budgets from database",
+			"error", err,
+			"user_id", userID,
+		)
 		return BudgetSummaryResponse{}, err
 	}
 
@@ -23,6 +28,10 @@ func (cfg *apiConfig) GetBudgetSummary(ctx context.Context, userID uuid.UUID, mo
 		Column2: month,
 	})
 	if err != nil {
+		slog.Error("failed to retrieve spending budget from database",
+			"error", err,
+			"user_id", userID,
+		)
 		return BudgetSummaryResponse{}, err
 	}
 
@@ -41,6 +50,10 @@ func (cfg *apiConfig) GetBudgetSummary(ctx context.Context, userID uuid.UUID, mo
 	for _, budget := range budgets {
 		category, err := cfg.dbQueries.GetCategory(ctx, budget.CategoryID)
 		if err != nil {
+			slog.Error("failed to retrieve category from database",
+				"error", err,
+				"category_id", budget.CategoryID,
+			)
 			return BudgetSummaryResponse{}, err
 		}
 

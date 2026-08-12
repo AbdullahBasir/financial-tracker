@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -17,6 +17,10 @@ func (cfg *apiConfig) HandlerGetSumBudgets(w http.ResponseWriter, r *http.Reques
 	}
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
+		slog.Error("invalid user ID in token subject",
+			"error", err,
+			"subject", claims.Subject,
+		)
 		RespondWithError(w, http.StatusUnauthorized, "invalid token")
 		return
 	}
@@ -34,7 +38,10 @@ func (cfg *apiConfig) HandlerGetSumBudgets(w http.ResponseWriter, r *http.Reques
 
 	summary, err := cfg.GetBudgetSummary(r.Context(), userID, month)
 	if err != nil {
-		log.Printf("Error: %v", err)
+		slog.Error("failed to retrieve budget summary from database",
+			"error", err,
+			"user_id", userID,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "failed to fetch budget summary")
 		return
 	}

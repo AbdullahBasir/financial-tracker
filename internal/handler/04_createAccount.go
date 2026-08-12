@@ -2,8 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -28,7 +27,10 @@ func (cfg *apiConfig) HandlerCreateAccount(w http.ResponseWriter, r *http.Reques
 
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
-		log.Printf("Error parsing user ID from token: %v", err)
+		slog.Error("invalid user ID in token subject",
+			"error", err,
+			"subject", claims.Subject,
+		)
 		RespondWithError(w, http.StatusUnauthorized, "invalid token subject")
 		return
 	}
@@ -37,7 +39,7 @@ func (cfg *apiConfig) HandlerCreateAccount(w http.ResponseWriter, r *http.Reques
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(&params)
 	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("could not access request body: %v", err))
+		RespondWithError(w, http.StatusBadRequest, "could not access request body")
 		return
 	}
 
@@ -52,6 +54,11 @@ func (cfg *apiConfig) HandlerCreateAccount(w http.ResponseWriter, r *http.Reques
 			RespondWithError(w, http.StatusConflict, "account already created")
 			return
 		}
+		slog.Error("failed to create account in database",
+			"error", err,
+			"user_id", userID,
+			"account_name", params.Name,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not create account")
 		return
 	}

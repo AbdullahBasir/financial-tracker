@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -71,6 +72,10 @@ func (cfg *apiConfig) HandlerGetTransactions(w http.ResponseWriter, r *http.Requ
 		Offset:    offset,
 	})
 	if err != nil {
+		slog.Error("failed to retrieve transactions from database",
+			"error", err,
+			"account_id", account.ID,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not fetch transactions")
 		return
 	}

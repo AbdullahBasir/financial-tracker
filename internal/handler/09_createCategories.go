@@ -2,8 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -22,7 +21,7 @@ func (cfg *apiConfig) HandlerCreateCategory(w http.ResponseWriter, r *http.Reque
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&params)
 	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("could not access request body: %v", err))
+		RespondWithError(w, http.StatusBadRequest, "could not access request body")
 		return
 	}
 
@@ -34,7 +33,10 @@ func (cfg *apiConfig) HandlerCreateCategory(w http.ResponseWriter, r *http.Reque
 
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
-		log.Printf("Error parsing user ID from token: %v", err)
+		slog.Error("invalid user ID in token subject",
+			"error", err,
+			"subject", claims.Subject,
+		)
 		RespondWithError(w, http.StatusUnauthorized, "invalid token subject")
 		return
 	}
@@ -49,6 +51,10 @@ func (cfg *apiConfig) HandlerCreateCategory(w http.ResponseWriter, r *http.Reque
 			RespondWithError(w, http.StatusConflict, "category already exists")
 			return
 		}
+		slog.Error("failed to create category from database",
+			"error", err,
+			"user_id", userID,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not create category")
 		return
 	}

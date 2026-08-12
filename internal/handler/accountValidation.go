@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
@@ -26,6 +27,10 @@ func (cfg *apiConfig) AccountValidation(id string, r *http.Request) (sqlc.Accoun
 
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
+		slog.Error("invalid user ID in token subject",
+			"error", err,
+			"subject", claims.Subject,
+		)
 		return sqlc.Account{}, &ValidationError{http.StatusUnauthorized, "invalid token subject"}
 	}
 

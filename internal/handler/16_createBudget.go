@@ -2,7 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -35,20 +35,27 @@ func (cfg *apiConfig) HandlerCreateBudget(w http.ResponseWriter, r *http.Request
 
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
-		log.Printf("Error parsing user ID from token: %v", err)
+		slog.Error("invalid user ID in token subject",
+			"error", err,
+			"subject", claims.Subject,
+		)
 		RespondWithError(w, http.StatusUnauthorized, "invalid token subject")
 		return
 	}
 
 	categoryID, err := uuid.Parse(params.CategoryID)
 	if err != nil {
-		log.Printf("Error parsing category ID from request: %v", err)
 		RespondWithError(w, http.StatusInternalServerError, "could not parse category id")
 		return
 	}
 
 	category, err := cfg.dbQueries.GetCategory(r.Context(), categoryID)
 	if err != nil {
+		slog.Error("failed to retrieve category from database",
+			"error", err,
+			"category_id", categoryID,
+			"user_id", userID,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not retrieve category")
 		return
 	}
@@ -69,6 +76,12 @@ func (cfg *apiConfig) HandlerCreateBudget(w http.ResponseWriter, r *http.Request
 			RespondWithError(w, http.StatusConflict, "budget already exists")
 			return
 		}
+		slog.Error("failed to create budget",
+			"error", err,
+			"user_id", userID,
+			"category_id", categoryID,
+			"month", params.Month,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not create budget")
 		return
 	}

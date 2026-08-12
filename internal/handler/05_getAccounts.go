@@ -1,8 +1,7 @@
 package handler
 
 import (
-	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -18,14 +17,21 @@ func (cfg *apiConfig) HandlerGetAccounts(w http.ResponseWriter, r *http.Request)
 
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
-		log.Printf("Error parsing user ID from token: %v", err)
+		slog.Error("invalid user ID in token subject",
+			"error", err,
+			"subject", claims.Subject,
+		)
 		RespondWithError(w, http.StatusUnauthorized, "invalid token subject")
 		return
 	}
 
 	accounts, err := cfg.dbQueries.GetAccounts(r.Context(), userID)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not retrieve accounts: %v", err))
+		slog.Error("failed to retrieve accounts from database",
+			"error", err,
+			"user_id", userID,
+		)
+		RespondWithError(w, http.StatusInternalServerError, "could not retrieve accounts")
 		return
 	}
 

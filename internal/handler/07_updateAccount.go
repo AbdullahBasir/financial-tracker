@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
@@ -53,6 +54,10 @@ func (cfg *apiConfig) HandlerUpdateAccount(w http.ResponseWriter, r *http.Reques
 
 	account, err := cfg.dbQueries.UpdateAccount(r.Context(), updateParams)
 	if err != nil {
+		slog.Error("failed to update account from database",
+			"error", err,
+			"account_id", updateParams.ID,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not update account")
 		return
 	}

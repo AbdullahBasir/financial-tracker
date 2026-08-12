@@ -3,7 +3,7 @@ package handler
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -53,7 +53,10 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
-		log.Printf("Error parsing user ID from token: %v", err)
+		slog.Error("invalid user ID in token subject",
+			"error", err,
+			"subject", claims.Subject,
+		)
 		RespondWithError(w, http.StatusUnauthorized, "invalid token subject")
 		return
 	}
@@ -72,6 +75,10 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 
 	account, err := cfg.dbQueries.GetAccount(r.Context(), accountID)
 	if err != nil {
+		slog.Error("failed to retrieve account from database",
+			"error", err,
+			"account_id", accountID,
+		)
 		RespondWithError(w, http.StatusNotFound, "account not found")
 		return
 	}
@@ -83,6 +90,10 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 
 	_, err = cfg.dbQueries.GetCategory(r.Context(), categoryID)
 	if err != nil {
+		slog.Error("failed to retrieve category from database",
+			"error", err,
+			"category_id", categoryID,
+		)
 		RespondWithError(w, http.StatusNotFound, "category not found")
 		return
 	}
@@ -100,7 +111,10 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 		CategoryID:  categoryID,
 	})
 	if err != nil {
-		log.Printf("Error creating transaction: %v", err)
+		slog.Error("failed to create transaction from database",
+			"error", err,
+			"user_id", userID,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not create transaction")
 		return
 	}

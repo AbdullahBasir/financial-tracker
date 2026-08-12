@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log/slog"
 	"net/http"
 )
 
@@ -18,6 +19,9 @@ func (cfg *apiConfig) HandlerDeleteAccount(w http.ResponseWriter, r *http.Reques
 
 	err := cfg.dbQueries.DeleteAccount(r.Context(), account.ID)
 	if err != nil {
+		slog.Error("failed to delete account from database",
+			"error", err,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not delete account")
 		return
 	}

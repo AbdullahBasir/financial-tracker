@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
@@ -16,6 +17,10 @@ func (cfg *apiConfig) TransactionValidation(id string, r *http.Request) (sqlc.Tr
 
 	checkTransaction, err := cfg.dbQueries.GetTransaction(r.Context(), transactionID)
 	if err != nil {
+		slog.Error("failed to retrieve transaction from database",
+			"error", err,
+			"transaction_id", transactionID,
+		)
 		return sqlc.Transaction{}, &ValidationError{http.StatusNotFound, "transaction not found"}
 	}
 
@@ -26,11 +31,18 @@ func (cfg *apiConfig) TransactionValidation(id string, r *http.Request) (sqlc.Tr
 
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
+		slog.Error("invalid user ID in token subject",
+			"error", err,
+		)
 		return sqlc.Transaction{}, &ValidationError{http.StatusUnauthorized, "invalid token subject"}
 	}
 
 	checkAccount, err := cfg.dbQueries.GetAccount(r.Context(), checkTransaction.AccountID)
 	if err != nil {
+		slog.Error("failed to retrieve account from database",
+			"error", err,
+			"transaction_id", checkTransaction.AccountID,
+		)
 		return sqlc.Transaction{}, &ValidationError{http.StatusNotFound, "account not found"}
 	}
 

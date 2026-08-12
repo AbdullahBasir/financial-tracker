@@ -2,7 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -20,7 +20,7 @@ func (cfg *apiConfig) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&params)
 	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("could not access request body: %v", err))
+		RespondWithError(w, http.StatusBadRequest, "could not access request body")
 		return
 	}
 
@@ -31,7 +31,8 @@ func (cfg *apiConfig) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 
 	hashedPassword, err := auth.HashPassword(params.Password)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not hash password: %v", err))
+		slog.Error("failed to hash password")
+		RespondWithError(w, http.StatusInternalServerError, "could not hash password")
 		return
 	}
 
@@ -44,6 +45,9 @@ func (cfg *apiConfig) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 			RespondWithError(w, http.StatusConflict, "email already registered")
 			return
 		}
+		slog.Error("failed to register user in database",
+			"error", err,
+		)
 		RespondWithError(w, http.StatusInternalServerError, "could not register user")
 		return
 	}
