@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
 	"github.com/golang-jwt/jwt/v5"
@@ -44,6 +45,10 @@ func (cfg *apiConfig) HandlerCreateCategory(w http.ResponseWriter, r *http.Reque
 		UserID: userID,
 	})
 	if err != nil {
+		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "UNIQUE constraint") {
+			RespondWithError(w, http.StatusConflict, "category already exists")
+			return
+		}
 		RespondWithError(w, http.StatusInternalServerError, "could not create category")
 		return
 	}

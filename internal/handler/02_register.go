@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
 	"github.com/AbdullahBasir/financial-tracker/internal/auth"
@@ -39,7 +40,11 @@ func (cfg *apiConfig) HandlerRegister(w http.ResponseWriter, r *http.Request) {
 		PasswordHash: hashedPassword,
 	})
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not register user: %v", err))
+		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "UNIQUE constraint") {
+			RespondWithError(w, http.StatusConflict, "email already registered")
+			return
+		}
+		RespondWithError(w, http.StatusInternalServerError, "could not register user")
 		return
 	}
 	RespondWithJSON(w, http.StatusCreated, User{

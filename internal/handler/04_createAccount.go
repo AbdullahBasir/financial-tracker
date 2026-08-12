@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
 	"github.com/golang-jwt/jwt/v5"
@@ -47,7 +48,11 @@ func (cfg *apiConfig) HandlerCreateAccount(w http.ResponseWriter, r *http.Reques
 		UserID:          userID,
 	})
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, fmt.Sprintf("could not create account: %v", err))
+		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "UNIQUE constraint") {
+			RespondWithError(w, http.StatusConflict, "account already created")
+			return
+		}
+		RespondWithError(w, http.StatusInternalServerError, "could not create account")
 		return
 	}
 

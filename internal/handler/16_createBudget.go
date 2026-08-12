@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
 	"github.com/golang-jwt/jwt/v5"
@@ -64,7 +65,11 @@ func (cfg *apiConfig) HandlerCreateBudget(w http.ResponseWriter, r *http.Request
 		CategoryID:   category.ID,
 	})
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, "could not create budget table")
+		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "UNIQUE constraint") {
+			RespondWithError(w, http.StatusConflict, "budget already exists")
+			return
+		}
+		RespondWithError(w, http.StatusInternalServerError, "could not create budget")
 		return
 	}
 
