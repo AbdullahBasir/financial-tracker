@@ -38,9 +38,12 @@ func main() {
 	router.Handle("GET /budgets", middleware.Auth(http.HandlerFunc(cfg.HandlerGetBudgets)))
 	router.Handle("GET /budgets/summary", middleware.Auth(http.HandlerFunc(cfg.HandlerGetSumBudgets)))
 
+	var app http.Handler = router
+	app = middleware.Logger(app)
+
 	serverStruct := &http.Server{
 		Addr:         ":8080",
-		Handler:      router,
+		Handler:      app,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  60 * time.Second,

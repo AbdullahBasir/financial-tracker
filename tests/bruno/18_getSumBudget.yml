@@ -17,6 +17,48 @@ http:
       type: query
   auth: inherit
 
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        const data = res.body;
+        const status = res.status;
+
+        expect(status).to.equal(200);
+        expect(res.headers['content-type']).to.include('application/json');
+
+        expect(data).to.be.an('object');
+        expect(data).to.have.property('month');
+        expect(data).to.have.property('items');
+        expect(data).to.have.property('total_budget');
+        expect(data).to.have.property('total_spent');
+        expect(data).to.have.property('total_remaining');
+
+        expect(data.month).to.equal('2026-08');
+        expect(data.items).to.be.an('array');
+
+        data.items.forEach((item, index) => {
+          expect(item).to.have.property('category_id');
+          expect(item).to.have.property('category_name');
+          expect(item).to.have.property('monthly_limit');
+          expect(item).to.have.property('total_spent');
+          expect(item).to.have.property('remaining');
+          expect(item).to.have.property('is_over_budget');
+          
+          expect(item.category_id).to.be.a('string');
+          expect(item.category_name).to.be.a('string');
+          expect(item.monthly_limit).to.be.a('string');
+          expect(item.total_spent).to.be.a('string');
+          expect(item.remaining).to.be.a('string');
+          expect(item.is_over_budget).to.be.a('boolean');
+        });
+
+        expect(data.total_budget).to.be.a('string');
+        expect(data.total_spent).to.be.a('string');
+        expect(data.total_remaining).to.be.a('string');
+
+        console.log(`Budget summary retrieval successful - ${data.items.length} categories found`);
+
 settings:
   encodeUrl: true
   timeout: 0

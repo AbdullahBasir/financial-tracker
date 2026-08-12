@@ -15,8 +15,8 @@ http:
     type: json
     data: |-
       {
-        "name": "work",
-        "type": "income"
+        "name": "taxes",
+        "type": "expenses"
       }
   auth: inherit
 
@@ -35,7 +35,7 @@ runtime:
         expect(data).to.have.property('name');
         expect(data).to.have.property('created_at');
         expect(data).to.have.property('type');
-        expect(category).to.have.property('user_id');
+        expect(data).to.have.property('user_id');
 
         console.log('Category creation successful');
 
