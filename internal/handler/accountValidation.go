@@ -17,6 +17,10 @@ func (cfg *apiConfig) AccountValidation(id string, r *http.Request) (sqlc.Accoun
 
 	checkAccount, err := cfg.dbQueries.GetAccount(r.Context(), accountID)
 	if err != nil {
+		slog.Error("failed to retrieve account from database",
+			"error", err,
+			"account_id", accountID,
+		)
 		return sqlc.Account{}, &ValidationError{http.StatusNotFound, "account not found"}
 	}
 
@@ -29,7 +33,6 @@ func (cfg *apiConfig) AccountValidation(id string, r *http.Request) (sqlc.Accoun
 	if err != nil {
 		slog.Error("invalid user ID in token subject",
 			"error", err,
-			"subject", claims.Subject,
 		)
 		return sqlc.Account{}, &ValidationError{http.StatusUnauthorized, "invalid token subject"}
 	}
