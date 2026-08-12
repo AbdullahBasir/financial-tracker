@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/AbdullahBasir/financial-tracker/internal/auth"
@@ -16,7 +16,7 @@ func Auth(next http.Handler) http.Handler {
 		cfg := handler.LoadConfig()
 		tokenString, err := auth.GetBearerToken(r.Header)
 		if err != nil {
-			handler.RespondWithError(w, http.StatusUnauthorized, fmt.Sprintf("missing or invalid authorization header: %v", err))
+			handler.RespondWithError(w, http.StatusUnauthorized, "missing or invalid authorization header")
 			return
 		}
 
@@ -25,13 +25,14 @@ func Auth(next http.Handler) http.Handler {
 		})
 
 		if err != nil || !token.Valid {
-			handler.RespondWithError(w, http.StatusUnauthorized, fmt.Sprintf("unauthorized access: %v", err))
+			handler.RespondWithError(w, http.StatusUnauthorized, "invalid or expired token")
 			return
 		}
 
 		claims, ok := token.Claims.(*jwt.RegisteredClaims)
 		if !ok {
-			handler.RespondWithError(w, http.StatusInternalServerError, "invalid token claims")
+			slog.Error("failed to extract claims from valid token")
+			handler.RespondWithError(w, http.StatusUnauthorized, "invalid token")
 			return
 		}
 
