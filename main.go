@@ -39,7 +39,7 @@ func main() {
 	router.Handle("GET /budgets/summary", middleware.Auth(http.HandlerFunc(cfg.HandlerGetSumBudgets)))
 
 	var app http.Handler = router
-	app = middleware.Logger(app)
+	app = middleware.Chain(router, middleware.Logger, middleware.Recoverer)
 
 	serverStruct := &http.Server{
 		Addr:         ":8080",
