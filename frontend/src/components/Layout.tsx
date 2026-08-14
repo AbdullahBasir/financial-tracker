@@ -12,7 +12,7 @@ export function Layout() {
   return (
     <div className="app-shell">
       <nav>
-        <NavLink to="/">Dashboard</NavLink>
+        <NavLink to="/dashboard">Dashboard</NavLink>
         <NavLink to="/accounts">Accounts</NavLink>
         <NavLink to="/transactions">Transactions</NavLink>
         <NavLink to="/categories">Categories</NavLink>

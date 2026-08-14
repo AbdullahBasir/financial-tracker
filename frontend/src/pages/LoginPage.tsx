@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { FormEvent } from 'react'
+import type { SyntheticEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authService } from '../services/auth'
 
@@ -10,14 +10,14 @@ export function LoginPage() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     setError('')
     setSubmitting(true)
 
     try {
       await authService.login(email, password)
-      navigate('/')
+      navigate('/dashboard')
     } catch (err) {
       setError((err as Error).message || 'Login failed')
     } finally {

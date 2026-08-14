@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { SyntheticEvent } from 'react'
 import { budgetService } from '../services/budgets'
 import type { Budget } from '../services/budgets'
 import { categoryService } from '../services/categories'
@@ -42,7 +42,7 @@ export function BudgetsPage() {
     }
   }
 
-  async function handleCreate(e: FormEvent) {
+  async function handleCreate(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     try {
       const newBudget = await budgetService.create({
@@ -113,7 +113,7 @@ export function BudgetsPage() {
               <tr key={b.id}>
                 <td>{categoryName(b.category_id)}</td>
                 <td>{b.month}</td>
-                <td>${b.monthly_limit.toFixed(2)}</td>
+                <td>${Number(b.monthly_limit).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>

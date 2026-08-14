@@ -65,7 +65,7 @@ export function AccountDetailPage() {
     <div>
       <h1>{account.name}</h1>
       <p>Type: {account.type}</p>
-      <p>Starting balance: ${account.starting_balance.toFixed(2)}</p>
+      <p>Starting balance: ${Number(account.starting_balance).toFixed(2)}</p>
 
       {error && <p className="error">{error}</p>}
 
@@ -80,7 +80,7 @@ export function AccountDetailPage() {
       <ul>
         {transactions.map(tx => (
           <li key={tx.id}>
-            {tx.occurred_at} — {tx.description} — ${tx.amount.toFixed(2)}
+            {tx.occurred_at} — {tx.description} — ${Number(tx.amount).toFixed(2)}
           </li>
         ))}
       </ul>

@@ -63,9 +63,9 @@ export function DashboardPage() {
               return (
                 <tr key={item.category_id} className={overBudget ? 'over-budget' : ''}>
                   <td>{item.category_name}</td>
-                  <td>${item.monthly_limit.toFixed(2)}</td>
-                  <td>${item.spent.toFixed(2)}</td>
-                  <td>${remaining.toFixed(2)}</td>
+                  <td>${Number(item.monthly_limit).toFixed(2)}</td>
+                  <td>${Number(item.spent).toFixed(2)}</td>
+                  <td>${Number(remaining).toFixed(2)}</td>
                 </tr>
               )
             })}

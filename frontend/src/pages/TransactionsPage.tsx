@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { SyntheticEvent } from 'react'
 import { transactionService } from '../services/transactions'
 import type { Transaction } from '../services/transactions'
 import { categoryService } from '../services/categories'
@@ -57,7 +57,7 @@ export function TransactionsPage() {
     }
   }
 
-  async function handleCreate(e: FormEvent) {
+  async function handleCreate(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     try {
       const newTx = await transactionService.create({
@@ -65,7 +65,7 @@ export function TransactionsPage() {
         category_id: form.categoryId,
         amount: parseFloat(form.amount),
         description: form.description,
-        occurred_at: form.occurredAt,
+        occurred_at: new Date(form.occurredAt).toISOString(),
       })
       setTransactions(prev => [newTx, ...prev])
       setForm({ accountId: '', categoryId: '', amount: '', description: '', occurredAt: '' })
@@ -191,7 +191,7 @@ export function TransactionsPage() {
               <tr key={tx.id}>
                 <td>{tx.occurred_at}</td>
                 <td>{tx.description}</td>
-                <td>${tx.amount.toFixed(2)}</td>
+                <td>${Number(tx.amount).toFixed(2)}</td>
                 <td><button onClick={() => handleDelete(tx.id)}>Delete</button></td>
               </tr>
             ))}

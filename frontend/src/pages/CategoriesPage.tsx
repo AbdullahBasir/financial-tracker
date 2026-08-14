@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { SyntheticEvent } from 'react'
 import { categoryService } from '../services/categories'
 import type { Category } from '../services/categories'
 
@@ -26,7 +26,7 @@ export function CategoriesPage() {
     }
   }
 
-  async function handleCreate(e: FormEvent) {
+  async function handleCreate(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!name.trim()) return
     try {
