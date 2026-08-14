@@ -102,9 +102,13 @@ func (cfg *apiConfig) HandlerGetTransactions(w http.ResponseWriter, r *http.Requ
 		})
 	}
 
-	RespondWithJSON(w, http.StatusOK, map[string]any{
-		"transactions": filtered,
-		"page":         page,
-		"page_size":    pageSize,
+	if filtered == nil {
+		filtered = []Transaction{}
+	}
+
+	RespondWithJSON(w, http.StatusOK, TransactionPage{
+		Transaction: filtered,
+		Page:        page,
+		PageSize:    pageSize,
 	})
 }

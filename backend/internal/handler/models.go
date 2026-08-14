@@ -71,3 +71,9 @@ type BudgetSummaryResponse struct {
 	TotalSpent     decimal.Decimal     `json:"total_spent"`
 	TotalRemaining decimal.Decimal     `json:"total_remaining"`
 }
+
+type TransactionPage struct {
+	Transaction []Transaction `json:"transactions"`
+	Page        int32         `json:"page"`
+	PageSize    int           `json:"page_size"`
+}
