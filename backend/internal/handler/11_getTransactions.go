@@ -80,7 +80,7 @@ func (cfg *apiConfig) HandlerGetTransactions(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var filtered []Transaction
+	filtered := []Transaction{}
 	for _, transaction := range transactions {
 		if categoryID != "" && transaction.CategoryID != parsedCategoryID {
 			continue

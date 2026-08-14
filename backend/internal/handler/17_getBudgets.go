@@ -35,7 +35,7 @@ func (cfg *apiConfig) HandlerGetBudgets(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var response []Budget
+	response := []Budget{}
 	for _, budget := range budgets {
 		response = append(response, Budget{
 			ID:           budget.ID,
