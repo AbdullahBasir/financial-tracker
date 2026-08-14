@@ -1,8 +1,11 @@
 const BASE_URL = import.meta.env.VITE_API_URL
 
-async function request(path: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('token')
+function getToken() {
+  return localStorage.getItem('token')
+}
 
+async function request(path: string, options: RequestInit = {}) {
+  const token = getToken()
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers: {
@@ -11,12 +14,6 @@ async function request(path: string, options: RequestInit = {}) {
       ...options.headers,
     },
   })
-
-  if (res.status === 401) {
-    localStorage.removeItem('token')
-    window.location.href = '/login'
-    throw new Error('Session expired')
-  }
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
@@ -29,7 +26,9 @@ async function request(path: string, options: RequestInit = {}) {
 
 export const api = {
   get: (path: string) => request(path),
-  post: (path: string, data: unknown) => request(path, { method: 'POST', body: JSON.stringify(data) }),
-  patch: (path: string, data: unknown) => request(path, { method: 'PATCH', body: JSON.stringify(data) }),
+  post: (path: string, data: unknown) =>
+    request(path, { method: 'POST', body: JSON.stringify(data) }),
+  patch: (path: string, data: unknown) =>
+    request(path, { method: 'PATCH', body: JSON.stringify(data) }),
   del: (path: string) => request(path, { method: 'DELETE' }),
 }

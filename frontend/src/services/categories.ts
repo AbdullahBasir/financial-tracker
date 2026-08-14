@@ -1,5 +1,6 @@
 import { api } from '../lib/api'
 
+<<<<<<< HEAD
 export interface Category {
   id: string
   user_id: string
@@ -8,7 +9,9 @@ export interface Category {
   created_at: string
 }
 
+=======
+>>>>>>> parent of ec8236c (Created the basic structure of the website with react, login and register working)
 export const categoryService = {
-  list: (): Promise<Category[]> => api.get('/categories'),
-  create: (data: Pick<Category, 'name' | 'type'>): Promise<Category> => api.post('/categories', data),
+  list: () => api.get('/categories'),
+  create: (data: unknown) => api.post('/categories', data),
 }
