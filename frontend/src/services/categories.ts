@@ -4,7 +4,7 @@ export interface Category {
   id: string
   user_id: string
   name: string
-  type: 'income' | 'expense'
+  type: 'income' | 'expenses'
   created_at: string
 }
 

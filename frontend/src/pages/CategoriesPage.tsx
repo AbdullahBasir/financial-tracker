@@ -6,7 +6,7 @@ import type { Category } from '../services/categories'
 export function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [name, setName] = useState('')
-  const [type, setType] = useState<'income' | 'expense'>('expense')
+  const [type, setType] = useState<'income' | 'expenses'>('expenses')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -50,8 +50,8 @@ export function CategoriesPage() {
           placeholder="Category name"
           required
         />
-        <select value={type} onChange={e => setType(e.target.value as 'income' | 'expense')}>
-          <option value="expense">Expense</option>
+        <select value={type} onChange={e => setType(e.target.value as 'income' | 'expenses')}>
+          <option value="expenses">Expenses</option>
           <option value="income">Income</option>
         </select>
         <button type="submit">Add Category</button>
