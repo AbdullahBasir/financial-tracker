@@ -1,0 +1,34 @@
+const BASE_URL = import.meta.env.VITE_API_URL
+
+function getToken() {
+  return localStorage.getItem('token')
+}
+
+async function request(path: string, options: RequestInit = {}) {
+  const token = getToken()
+  const res = await fetch(`${BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  })
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.message || `Request failed: ${res.status}`)
+  }
+
+  if (res.status === 204) return null
+  return res.json()
+}
+
+export const api = {
+  get: (path: string) => request(path),
+  post: (path: string, data: unknown) =>
+    request(path, { method: 'POST', body: JSON.stringify(data) }),
+  patch: (path: string, data: unknown) =>
+    request(path, { method: 'PATCH', body: JSON.stringify(data) }),
+  del: (path: string) => request(path, { method: 'DELETE' }),
+}
