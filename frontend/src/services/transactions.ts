@@ -11,9 +11,10 @@ export interface Transaction {
 }
 
 export interface TransactionPage {
-  transaction: Transaction[] 
-  page: number
-  page_size: number
+  transactions?: Transaction[]
+  transaction?: Transaction[]
+  page?: number
+  page_size?: number
 }
 
 export interface TransactionFilters {
@@ -28,7 +29,7 @@ export const transactionService = {
   list: async (filters: TransactionFilters = {}): Promise<Transaction[]> => {
     const params = new URLSearchParams(filters as Record<string, string>)
     const result: TransactionPage = await api.get(`/transactions?${params}`)
-    return result.transaction ?? []
+    return result.transactions ?? result.transaction ?? []
   },
   get: (id: string): Promise<Transaction> => api.get(`/transactions/${id}`),
   create: (data: Pick<Transaction, 'account_id' | 'category_id' | 'amount' | 'description' | 'occurred_at'>): Promise<Transaction> =>

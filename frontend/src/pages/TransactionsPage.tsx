@@ -1,3 +1,4 @@
+// src/pages/TransactionsPage.tsx
 import { useEffect, useState } from 'react'
 import type { SyntheticEvent } from 'react'
 import { transactionService } from '../services/transactions'
@@ -29,7 +30,30 @@ export function TransactionsPage() {
   }, [])
 
   useEffect(() => {
-    loadTransactions()
+    let cancelled = false
+
+    async function load() {
+      try {
+        setLoading(true)
+        const cleanFilters = Object.fromEntries(
+          Object.entries(filters).filter(([, v]) => v !== '')
+        )
+        const data = await transactionService.list(cleanFilters)
+        if (!cancelled) {
+          setTransactions(data)
+        }
+      } catch (err) {
+        if (!cancelled) setError((err as Error).message)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    load()
+
+    return () => {
+      cancelled = true
+    }
   }, [filters])
 
   async function loadStaticData() {
@@ -39,21 +63,6 @@ export function TransactionsPage() {
       setAccounts(accs)
     } catch (err) {
       setError((err as Error).message)
-    }
-  }
-
-  async function loadTransactions() {
-    try {
-      setLoading(true)
-      const cleanFilters = Object.fromEntries(
-        Object.entries(filters).filter(([, v]) => v !== '')
-      )
-      const data = await transactionService.list(cleanFilters)
-      setTransactions(data)
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -174,9 +183,13 @@ export function TransactionsPage() {
         </form>
       </section>
 
-      {loading ? (
-        <p>Loading transactions...</p>
-      ) : (
+      {loading && <p>Loading transactions...</p>}
+
+      {!loading && transactions.length === 0 && (
+        <p className="empty-state">No transactions yet — add one above to get started.</p>
+      )}
+
+      {!loading && transactions.length > 0 && (
         <table>
           <thead>
             <tr>
