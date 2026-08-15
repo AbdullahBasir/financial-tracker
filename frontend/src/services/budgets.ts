@@ -14,7 +14,9 @@ export interface BudgetSummaryItem {
   category_id: string
   category_name: string
   monthly_limit: number
-  spent: number
+  total_spent: number
+  remaining: number
+  is_over_budget: boolean
 }
 
 export interface BudgetSummaryResponse {
