@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/AbdullahBasir/financial-tracker/database/sqlc"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -17,10 +18,27 @@ func (cfg *apiConfig) HandlerGetTransactions(w http.ResponseWriter, r *http.Requ
 	to := r.URL.Query().Get("to")
 	pageStr := r.URL.Query().Get("page")
 
-	account, validation := cfg.AccountValidation(accountID, r)
-	if validation != nil {
-		RespondWithError(w, validation.Code, validation.Message)
+	claims, ok := r.Context().Value("claims").(*jwt.RegisteredClaims)
+	if !ok || claims == nil {
+		RespondWithError(w, http.StatusUnauthorized, "invalid authentication")
 		return
+	}
+
+	userID, err := uuid.Parse(claims.Subject)
+	if err != nil {
+		slog.Error("invalid user ID in token subject", "error", err)
+		RespondWithError(w, http.StatusUnauthorized, "invalid token subject")
+		return
+	}
+
+	var accountFilter uuid.UUID
+	if accountID != "" {
+		account, validation := cfg.AccountValidation(accountID, r)
+		if validation != nil {
+			RespondWithError(w, validation.Code, validation.Message)
+			return
+		}
+		accountFilter = account.ID
 	}
 
 	var parsedCategoryID uuid.UUID
@@ -67,14 +85,15 @@ func (cfg *apiConfig) HandlerGetTransactions(w http.ResponseWriter, r *http.Requ
 	offset := (page - 1) * int32(pageSize)
 
 	transactions, err := cfg.dbQueries.GetTransactions(r.Context(), sqlc.GetTransactionsParams{
-		AccountID: account.ID,
-		Limit:     int32(pageSize),
-		Offset:    offset,
+		UserID:  userID,
+		Column2: accountFilter,
+		Limit:   int32(pageSize),
+		Offset:  offset,
 	})
 	if err != nil {
 		slog.Error("failed to retrieve transactions from database",
 			"error", err,
-			"account_id", account.ID,
+			"account_id", accountFilter,
 		)
 		RespondWithError(w, http.StatusInternalServerError, "could not fetch transactions")
 		return
