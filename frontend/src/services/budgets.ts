@@ -1,3 +1,4 @@
+// src/services/budgets.ts
 import { api } from '../lib/api'
 
 export interface Budget {
@@ -16,9 +17,23 @@ export interface BudgetSummaryItem {
   spent: number
 }
 
+export interface BudgetSummaryResponse {
+  month: string
+  items: BudgetSummaryItem[]
+  total_budget: number
+  total_spent: number
+  total_remaining: number
+}
+
 export const budgetService = {
-  list: (): Promise<Budget[]> => api.get('/budgets'),
+  list: async (): Promise<Budget[]> => {
+    const data = await api.get('/budgets')
+    return data ?? []
+  },
   create: (data: Pick<Budget, 'category_id' | 'monthly_limit' | 'month'>): Promise<Budget> =>
     api.post('/budgets', data),
-  summary: (month: string): Promise<BudgetSummaryItem[]> => api.get(`/budgets/summary?month=${month}`),
+  summary: async (month: string): Promise<BudgetSummaryItem[]> => {
+    const result: BudgetSummaryResponse = await api.get(`/budgets/summary?month=${month}`)
+    return result.items ?? []
+  },
 }

@@ -21,6 +21,7 @@ export function DashboardPage() {
     try {
       setLoading(true)
       const data = await budgetService.summary(m)
+      console.log('summary data:', data)
       setSummary(data)
     } catch (err) {
       setError((err as Error).message)
@@ -57,18 +58,14 @@ export function DashboardPage() {
             </tr>
           </thead>
           <tbody>
-            {summary.map(item => {
-              const remaining = item.monthly_limit - item.spent
-              const overBudget = remaining < 0
-              return (
-                <tr key={item.category_id} className={overBudget ? 'over-budget' : ''}>
-                  <td>{item.category_name}</td>
-                  <td>${Number(item.monthly_limit).toFixed(2)}</td>
-                  <td>${Number(item.spent).toFixed(2)}</td>
-                  <td>${Number(remaining).toFixed(2)}</td>
-                </tr>
-              )
-            })}
+            {summary.map(item => (
+              <tr key={item.category_id} className={item.is_over_budget ? 'over-budget' : ''}>
+                <td>{item.category_name}</td>
+                <td>${Number(item.monthly_limit).toFixed(2)}</td>
+                <td>${Number(item.total_spent).toFixed(2)}</td>
+                <td>${Number(item.remaining).toFixed(2)}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       )}
