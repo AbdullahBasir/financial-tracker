@@ -73,7 +73,7 @@ type BudgetSummaryResponse struct {
 }
 
 type TransactionPage struct {
-	Transaction []Transaction `json:"transactions"`
+	Transaction []Transaction `json:"transaction"`
 	Page        int32         `json:"page"`
 	PageSize    int           `json:"page_size"`
 }
