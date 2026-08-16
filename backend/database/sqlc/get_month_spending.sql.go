@@ -31,7 +31,7 @@ type GetMonthlySpendingParams struct {
 }
 
 type GetMonthlySpendingRow struct {
-	CategoryID uuid.UUID
+	CategoryID uuid.NullUUID
 	TotalSpent decimal.Decimal
 }
 

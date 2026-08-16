@@ -26,7 +26,7 @@ type UpdateTransactionParams struct {
 	OccurredAt  time.Time
 	Description sql.NullString
 	AccountID   uuid.UUID
-	CategoryID  uuid.UUID
+	CategoryID  uuid.NullUUID
 	ID          uuid.UUID
 }
 

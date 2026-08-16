@@ -27,6 +27,7 @@ func main() {
 
 	router.Handle("POST /categories", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateCategory)))
 	router.Handle("GET /categories", middleware.Auth(http.HandlerFunc(cfg.HandlerGetCategories)))
+	router.Handle("DELETE /categories/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerDeleteCategory)))
 
 	router.Handle("GET /transactions", middleware.Auth(http.HandlerFunc(cfg.HandlerGetTransactions)))
 	router.Handle("POST /transactions", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateTransaction)))
@@ -36,7 +37,7 @@ func main() {
 
 	router.Handle("POST /budgets", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateBudget)))
 	router.Handle("GET /budgets", middleware.Auth(http.HandlerFunc(cfg.HandlerGetBudgets)))
-	router.Handle("GET /budgets/summary", middleware.Auth(http.HandlerFunc(cfg.HandlerGetSumBudgets)))
+	router.Handle("DELETE /budgets/summary", middleware.Auth(http.HandlerFunc(cfg.HandlerGetSumBudgets)))
 
 	var app http.Handler = router
 	app = middleware.Chain(router, middleware.CORS, middleware.Logger, middleware.Recoverer)

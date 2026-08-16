@@ -1,6 +1,10 @@
 package handler
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/google/uuid"
+)
 
 func (cfg *apiConfig) HandlerGetTransaction(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
@@ -15,6 +19,11 @@ func (cfg *apiConfig) HandlerGetTransaction(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	var categoryIDPtr *uuid.UUID
+	if transaction.CategoryID.Valid {
+		categoryIDPtr = &transaction.CategoryID.UUID
+	}
+
 	RespondWithJSON(w, http.StatusOK, Transaction{
 		ID:          transaction.ID,
 		Amount:      transaction.Amount,
@@ -22,6 +31,6 @@ func (cfg *apiConfig) HandlerGetTransaction(w http.ResponseWriter, r *http.Reque
 		OccurredAt:  transaction.OccurredAt,
 		Description: transaction.Description.String,
 		AccountID:   transaction.AccountID,
-		CategoryID:  transaction.CategoryID,
+		CategoryID:  categoryIDPtr,
 	})
 }

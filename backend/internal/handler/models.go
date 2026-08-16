@@ -43,7 +43,7 @@ type Transaction struct {
 	OccurredAt  time.Time       `json:"occurred_at"`
 	Description string          `json:"description"`
 	AccountID   uuid.UUID       `json:"account_id"`
-	CategoryID  uuid.UUID       `json:"category_id"`
+	CategoryID  *uuid.UUID      `json:"category_id"`
 }
 
 type Budget struct {

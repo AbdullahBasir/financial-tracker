@@ -101,14 +101,20 @@ func (cfg *apiConfig) HandlerGetTransactions(w http.ResponseWriter, r *http.Requ
 
 	filtered := []Transaction{}
 	for _, transaction := range transactions {
-		if categoryID != "" && transaction.CategoryID != parsedCategoryID {
-			continue
+		if categoryID != "" {
+			if !transaction.CategoryID.Valid || transaction.CategoryID.UUID != parsedCategoryID {
+				continue
+			}
 		}
 		if from != "" && transaction.OccurredAt.Before(fromDate) {
 			continue
 		}
 		if to != "" && transaction.OccurredAt.After(toDate) {
 			continue
+		}
+		var categoryIDPtr *uuid.UUID
+		if transaction.CategoryID.Valid {
+			categoryIDPtr = &transaction.CategoryID.UUID
 		}
 		filtered = append(filtered, Transaction{
 			ID:          transaction.ID,
@@ -117,7 +123,7 @@ func (cfg *apiConfig) HandlerGetTransactions(w http.ResponseWriter, r *http.Requ
 			OccurredAt:  transaction.OccurredAt,
 			Description: transaction.Description.String,
 			AccountID:   transaction.AccountID,
-			CategoryID:  transaction.CategoryID,
+			CategoryID:  categoryIDPtr,
 		})
 	}
 

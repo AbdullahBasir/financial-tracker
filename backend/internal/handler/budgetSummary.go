@@ -37,7 +37,7 @@ func (cfg *apiConfig) GetBudgetSummary(ctx context.Context, userID uuid.UUID, mo
 
 	spendingMap := make(map[uuid.UUID]decimal.Decimal)
 	for _, spent := range spending {
-		spendingMap[spent.CategoryID] = spent.TotalSpent
+		spendingMap[spent.CategoryID.UUID] = spent.TotalSpent
 	}
 
 	summary := BudgetSummaryResponse{

@@ -108,7 +108,7 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 		OccurredAt:  params.OccurredAt,
 		Description: description,
 		AccountID:   accountID,
-		CategoryID:  categoryID,
+		CategoryID:  uuid.NullUUID{UUID: categoryID, Valid: true},
 	})
 	if err != nil {
 		slog.Error("failed to create transaction from database",
@@ -119,6 +119,11 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	var categoryIDPtr *uuid.UUID
+	if transaction.CategoryID.Valid {
+		categoryIDPtr = &transaction.CategoryID.UUID
+	}
+
 	RespondWithJSON(w, http.StatusCreated, Transaction{
 		ID:          transaction.ID,
 		Amount:      transaction.Amount,
@@ -126,6 +131,6 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 		OccurredAt:  transaction.OccurredAt,
 		Description: transaction.Description.String,
 		AccountID:   transaction.AccountID,
-		CategoryID:  transaction.CategoryID,
+		CategoryID:  categoryIDPtr,
 	})
 }

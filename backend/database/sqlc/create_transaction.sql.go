@@ -32,7 +32,7 @@ type CreateTransactionParams struct {
 	OccurredAt  time.Time
 	Description sql.NullString
 	AccountID   uuid.UUID
-	CategoryID  uuid.UUID
+	CategoryID  uuid.NullUUID
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {

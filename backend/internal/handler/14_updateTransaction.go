@@ -80,7 +80,7 @@ func (cfg *apiConfig) HandlerUpdateTransaction(w http.ResponseWriter, r *http.Re
 			RespondWithError(w, http.StatusBadRequest, "invalid category_id format")
 			return
 		}
-		updateParams.CategoryID = categoryID
+		updateParams.CategoryID = uuid.NullUUID{UUID: categoryID, Valid: true}
 	}
 
 	updated, err := cfg.dbQueries.UpdateTransaction(r.Context(), updateParams)
@@ -93,6 +93,11 @@ func (cfg *apiConfig) HandlerUpdateTransaction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	var categoryIDPtr *uuid.UUID
+	if updated.CategoryID.Valid {
+		categoryIDPtr = &updated.CategoryID.UUID
+	}
+
 	RespondWithJSON(w, http.StatusOK, Transaction{
 		ID:          updated.ID,
 		Amount:      updated.Amount,
@@ -100,6 +105,6 @@ func (cfg *apiConfig) HandlerUpdateTransaction(w http.ResponseWriter, r *http.Re
 		OccurredAt:  updated.OccurredAt,
 		Description: updated.Description.String,
 		AccountID:   updated.AccountID,
-		CategoryID:  updated.CategoryID,
+		CategoryID:  categoryIDPtr,
 	})
 }
