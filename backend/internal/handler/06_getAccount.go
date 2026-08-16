@@ -18,19 +18,27 @@ func (cfg *apiConfig) HandlerGetAccount(w http.ResponseWriter, r *http.Request) 
 		RespondWithError(w, validation.Code, validation.Message)
 		return
 	}
-	expense, err := cfg.dbQueries.GetTotalExpenseAmount(r.Context(), sqlc.GetTotalExpenseAmountParams{
+	totalExpenses, err := cfg.dbQueries.GetTotalExpenseAmount(r.Context(), sqlc.GetTotalExpenseAmountParams{
 		UserID: account.UserID,
 		ID:     account.ID,
 	})
 	if err != nil {
-		slog.Error("failed to retrieve expense from database",
-			"error", err,
-			"account_id", account.ID,
-		)
+		slog.Error("failed to retrieve expense total", "error", err, "account_id", account.ID)
 		RespondWithError(w, http.StatusInternalServerError, "failed to retrieve sum expenses")
+		return
 	}
 
-	balance := account.StartingBalance.Sub(expense)
+	totalIncome, err := cfg.dbQueries.GetTotalIncomeAmount(r.Context(), sqlc.GetTotalIncomeAmountParams{
+		UserID: account.UserID,
+		ID:     account.ID,
+	})
+	if err != nil {
+		slog.Error("failed to retrieve income total", "error", err, "account_id", account.ID)
+		RespondWithError(w, http.StatusInternalServerError, "failed to retrieve sum income")
+		return
+	}
+
+	balance := account.StartingBalance.Add(totalIncome).Sub(totalExpenses)
 
 	RespondWithJSON(w, http.StatusOK, Account{
 		ID:              account.ID,
