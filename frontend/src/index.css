@@ -243,7 +243,7 @@ tr:hover td {
   background: var(--color-surface-sunken);
 }
 
-tr.over-budget td {
+tr.balance-negative td {
   color: var(--color-error);
   font-weight: 600;
 }
@@ -450,5 +450,16 @@ form {
 .transaction-amount {
   font-weight: 600;
   color: var(--color-ink-secondary);
+}
+
+.form-error {
+  margin-bottom: var(--space-3);
+}
+
+.field-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--color-ink-muted);
 }
 

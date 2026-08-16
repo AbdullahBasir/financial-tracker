@@ -9,22 +9,54 @@ import { accountService } from '../services/accounts'
 import type { Account } from '../services/accounts'
 import { formatDate } from '../lib/format'
 
+interface TransactionFilters {
+  account_id: string
+  category_id: string
+  from: string
+  to: string
+}
+
+interface TransactionFormState {
+  accountId: string
+  categoryId: string
+  amount: string
+  description: string
+  occurredAt: string
+}
+
+const EMPTY_FORM: TransactionFormState = {
+  accountId: '',
+  categoryId: '',
+  amount: '',
+  description: '',
+  occurredAt: '',
+}
+
+function toCleanFilters(filters: TransactionFilters) {
+  return Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== ''))
+}
+
 export function TransactionsPage() {
+  // Data
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [accounts, setAccounts] = useState<Account[]>([])
+
+  // Page state
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const [filters, setFilters] = useState({ account_id: '', category_id: '', from: '', to: '' })
-
-  const [form, setForm] = useState({
-    accountId: '',
-    categoryId: '',
-    amount: '',
-    description: '',
-    occurredAt: '',
+  // Filters
+  const [filters, setFilters] = useState<TransactionFilters>({
+    account_id: '',
+    category_id: '',
+    from: '',
+    to: '',
   })
+
+  // Add-transaction form
+  const [form, setForm] = useState<TransactionFormState>(EMPTY_FORM)
+  const [formError, setFormError] = useState('')
 
   useEffect(() => {
     loadStaticData()
@@ -36,13 +68,8 @@ export function TransactionsPage() {
     async function load() {
       try {
         setLoading(true)
-        const cleanFilters = Object.fromEntries(
-          Object.entries(filters).filter(([, v]) => v !== '')
-        )
-        const data = await transactionService.list(cleanFilters)
-        if (!cancelled) {
-          setTransactions(data)
-        }
+        const data = await transactionService.list(toCleanFilters(filters))
+        if (!cancelled) setTransactions(data)
       } catch (err) {
         if (!cancelled) setError((err as Error).message)
       } finally {
@@ -51,7 +78,6 @@ export function TransactionsPage() {
     }
 
     load()
-
     return () => {
       cancelled = true
     }
@@ -69,16 +95,24 @@ export function TransactionsPage() {
 
   async function handleCreate(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
+    setFormError('')
+
+    const amount = parseFloat(form.amount)
+    if (isNaN(amount) || amount < 0) {
+      setFormError('Amount cannot be negative or invalid.')
+      return
+    }
+
     try {
       const newTx = await transactionService.create({
         account_id: form.accountId,
         category_id: form.categoryId,
-        amount: parseFloat(form.amount),
+        amount,
         description: form.description,
         occurred_at: new Date(form.occurredAt).toISOString(),
       })
       setTransactions(prev => [newTx, ...prev])
-      setForm({ accountId: '', categoryId: '', amount: '', description: '', occurredAt: '' })
+      setForm(EMPTY_FORM)
     } catch (err) {
       setError((err as Error).message)
     }
@@ -93,10 +127,17 @@ export function TransactionsPage() {
     }
   }
 
+  function updateFormField<K extends keyof TransactionFormState>(field: K, value: TransactionFormState[K]) {
+    setForm(f => ({ ...f, [field]: value }))
+    if (formError) setFormError('')
+  }
+
   return (
     <div>
       <h1>Transactions</h1>
+
       {error && <p className="error">{error}</p>}
+      {formError && <p className="error form-error">{formError}</p>}
 
       <section>
         <h2>Filters</h2>
@@ -104,7 +145,7 @@ export function TransactionsPage() {
           value={filters.account_id}
           onChange={e => setFilters(f => ({ ...f, account_id: e.target.value }))}
         >
-          <option value="">All accounts</option>
+          <option value="" disabled>Accounts</option>
           {accounts.map(a => (
             <option key={a.id} value={a.id}>{a.name}</option>
           ))}
@@ -114,7 +155,7 @@ export function TransactionsPage() {
           value={filters.category_id}
           onChange={e => setFilters(f => ({ ...f, category_id: e.target.value }))}
         >
-          <option value="">All categories</option>
+          <option value="">Categories</option>
           {categories.map(c => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
@@ -137,7 +178,7 @@ export function TransactionsPage() {
         <form onSubmit={handleCreate}>
           <select
             value={form.accountId}
-            onChange={e => setForm(f => ({ ...f, accountId: e.target.value }))}
+            onChange={e => updateFormField('accountId', e.target.value)}
             required
           >
             <option value="" disabled>Account</option>
@@ -148,7 +189,7 @@ export function TransactionsPage() {
 
           <select
             value={form.categoryId}
-            onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}
+            onChange={e => updateFormField('categoryId', e.target.value)}
             required
           >
             <option value="" disabled>Category</option>
@@ -157,26 +198,29 @@ export function TransactionsPage() {
             ))}
           </select>
 
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Amount"
-            value={form.amount}
-            onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
-            required
-          />
+          <div>
+            <input
+              type="number"
+              step="0.01"
+              min="0.01"
+              placeholder="Amount"
+              value={form.amount}
+              onChange={e => updateFormField('amount', e.target.value)}
+              required
+            />
+          </div>
 
           <input
             type="text"
             placeholder="Description"
             value={form.description}
-            onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+            onChange={e => updateFormField('description', e.target.value)}
           />
 
           <input
             type="date"
             value={form.occurredAt}
-            onChange={e => setForm(f => ({ ...f, occurredAt: e.target.value }))}
+            onChange={e => updateFormField('occurredAt', e.target.value)}
             required
           />
 
@@ -201,15 +245,18 @@ export function TransactionsPage() {
             </tr>
           </thead>
           <tbody>
-            {transactions.map(tx => (
+          {transactions.map(tx => {
+            const amount = Number(tx.amount)
+            return (
               <tr key={tx.id}>
                 <td>{formatDate(tx.occurred_at)}</td>
                 <td>{tx.description}</td>
-                <td>${Number(tx.amount).toFixed(2)}</td>
+                <td>${amount.toFixed(2)}</td>
                 <td><button onClick={() => handleDelete(tx.id)}>Delete</button></td>
               </tr>
-            ))}
-          </tbody>
+            )
+          })}
+        </tbody>
         </table>
       )}
     </div>

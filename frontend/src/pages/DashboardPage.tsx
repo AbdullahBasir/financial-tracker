@@ -59,7 +59,7 @@ export function DashboardPage() {
           </thead>
           <tbody>
             {summary.map(item => (
-              <tr key={item.category_id} className={item.is_over_budget ? 'over-budget' : ''}>
+              <tr key={item.category_id} className={item.is_over_budget ? 'balance-negative' : ''}>
                 <td>{item.category_name}</td>
                 <td>${Number(item.monthly_limit).toFixed(2)}</td>
                 <td>${Number(item.total_spent).toFixed(2)}</td>
