@@ -30,6 +30,11 @@ func (cfg *apiConfig) HandlerCreateTransaction(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	if params.Amount.LessThan(decimal.New(0, 0)) {
+		RespondWithError(w, http.StatusBadRequest, "amount cannot be negative")
+		return
+	}
+
 	if params.Amount.IsZero() {
 		RespondWithError(w, http.StatusBadRequest, "amount is required")
 		return

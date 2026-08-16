@@ -43,11 +43,6 @@ func (cfg *apiConfig) HandlerCreateAccount(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if params.StartingBalance.LessThan(decimal.New(0, 0)) {
-		RespondWithError(w, http.StatusBadRequest, "amount cannot be negative")
-		return
-	}
-
 	account, err := cfg.dbQueries.CreateAccount(r.Context(), sqlc.CreateAccountParams{
 		Name:            params.Name,
 		StartingBalance: params.StartingBalance,
