@@ -3,11 +3,11 @@ import { api } from '../lib/api'
 
 export interface Budget {
   id: string
-  user_id: string
-  category_id: string
+  created_at: string
   monthly_limit: number
   month: string
-  created_at: string
+  user_id: string
+  category_id: string
 }
 
 export interface BudgetSummaryItem {

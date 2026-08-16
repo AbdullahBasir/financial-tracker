@@ -2,11 +2,11 @@ import { api } from '../lib/api'
 
 export interface Account {
   id: string
-  user_id: string
   name: string
-  type: 'checking' | 'savings' | 'credit'
-  starting_balance: number
   created_at: string
+  starting_balance: number
+  type: 'checking' | 'savings' | 'credit'
+  user_id: string
 }
 
 export const accountService = {

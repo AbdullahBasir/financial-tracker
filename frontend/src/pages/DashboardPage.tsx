@@ -52,7 +52,7 @@ export function DashboardPage() {
           <thead>
             <tr>
               <th>Category</th>
-              <th>Budgeted</th>
+              <th>Budget</th>
               <th>Spent</th>
               <th>Remaining</th>
             </tr>

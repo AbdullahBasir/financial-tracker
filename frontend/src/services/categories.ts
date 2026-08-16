@@ -2,10 +2,10 @@ import { api } from '../lib/api'
 
 export interface Category {
   id: string
-  user_id: string
   name: string
-  type: 'income' | 'expenses'
   created_at: string
+  type: 'income' | 'expenses'
+  user_id: string
 }
 
 export const categoryService = {

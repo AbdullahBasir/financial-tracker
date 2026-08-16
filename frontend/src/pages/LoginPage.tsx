@@ -1,3 +1,4 @@
+// src/pages/LoginPage.tsx
 import { useState } from 'react'
 import type { SyntheticEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -19,7 +20,7 @@ export function LoginPage() {
       await authService.login(email, password)
       navigate('/dashboard')
     } catch (err) {
-      setError((err as Error).message || 'Login failed')
+      setError((err as Error).message || 'Login failed. Please check your credentials and try again.')
     } finally {
       setSubmitting(false)
     }
