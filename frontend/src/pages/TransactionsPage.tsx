@@ -7,6 +7,7 @@ import { categoryService } from '../services/categories'
 import type { Category } from '../services/categories'
 import { accountService } from '../services/accounts'
 import type { Account } from '../services/accounts'
+import { formatDate } from '../lib/format'
 
 export function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -202,7 +203,7 @@ export function TransactionsPage() {
           <tbody>
             {transactions.map(tx => (
               <tr key={tx.id}>
-                <td>{tx.occurred_at}</td>
+                <td>{formatDate(tx.occurred_at)}</td>
                 <td>{tx.description}</td>
                 <td>${Number(tx.amount).toFixed(2)}</td>
                 <td><button onClick={() => handleDelete(tx.id)}>Delete</button></td>

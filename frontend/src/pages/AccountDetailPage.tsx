@@ -1,20 +1,21 @@
 // src/pages/AccountDetailPage.tsx
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { accountService } from '../services/accounts'
 import type { Account } from '../services/accounts'
 import { transactionService } from '../services/transactions'
 import type { Transaction } from '../services/transactions'
+import { formatDate } from '../lib/format'
 
 export function AccountDetailPage() {
   const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
 
   const [account, setAccount] = useState<Account | null>(null)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [name, setName] = useState('')
+  const [type, setType] = useState<'checking' | 'savings' | 'credit'>('credit')
   const [starting_balance, setBalance] = useState<number | ''>('')
-  const [editingBalance, setEditingBalance] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -32,6 +33,7 @@ export function AccountDetailPage() {
       ])
       setAccount(acc)
       setName(acc.name)
+      setType(acc.type)
       setBalance(Number(acc.starting_balance))
       setTransactions(txs)
     } catch (err) {
@@ -41,40 +43,38 @@ export function AccountDetailPage() {
     }
   }
 
-  async function handleRename() {
-    if (!id || !name.trim()) return
-    try {
-      const updated = await accountService.update(id, { name })
-      setAccount(updated)
-    } catch (err) {
-      setError((err as Error).message)
-    }
-  }
-
-   async function handleUpdateBalance() {
-    if (!id || starting_balance === '') return
-    try {
-      const updated = await accountService.update(id, { starting_balance })
-      setAccount(updated)
-      setEditingBalance(false)
-    } catch (err) {
-      setError((err as Error).message)
-    }
-  }
-
-  function handleCancelBalance() {
-    setEditingBalance(false)
-    setBalance(Number(account?.starting_balance || 0))
-  }
-
-  async function handleDelete() {
+  async function handleSaveChanges() {
     if (!id) return
     try {
-      await accountService.remove(id)
-      navigate('/accounts')
+      const updates: Partial<Account> = {}
+      if (name.trim() && name !== account?.name) {
+        updates.name = name
+      }
+      if (type !== account?.type) {
+        updates.type = type
+      }
+      if (starting_balance !== '' && starting_balance !== Number(account?.starting_balance)) {
+        updates.starting_balance = starting_balance
+      }
+
+      if (Object.keys(updates).length === 0) {
+        setIsEditing(false)
+        return
+      }
+
+      const updated = await accountService.update(id, updates)
+      setAccount(updated)
+      setIsEditing(false)
     } catch (err) {
       setError((err as Error).message)
     }
+  }
+
+  function handleCancel() {
+    setIsEditing(false)
+    setName(account?.name || '')
+    setType(account?.type || 'credit')
+    setBalance(Number(account?.starting_balance || 0))
   }
 
   if (loading) return <p>Loading account...</p>
@@ -82,22 +82,62 @@ export function AccountDetailPage() {
 
   return (
     <div>
-      <h1>{account.name}</h1>
-      <p>Type: {account.type}</p>
-      
-      <div className="balance-section">
-        {!editingBalance ? (
-          <div className="balance-display">
-            <p>
-              Starting balance: <strong>${Number(account.starting_balance).toFixed(2)}</strong>
-            </p>
-            <button onClick={() => setEditingBalance(true)} className="btn-edit">
-              Edit Balance
-            </button>
+      {!isEditing && (
+        <div className="account-header">
+          <div>
+            <h1>{account.name}</h1>
           </div>
-        ) : (
-          <div className="balance-edit">
-            <label htmlFor="balance-input">New Starting Balance:</label>
+          <button onClick={() => setIsEditing(true)} className="btn-edit">
+            Edit Account
+          </button>
+        </div>
+      )}
+
+      {isEditing && (
+        <div className="account-edit-mode">
+          <h1>Edit Account</h1>
+        </div>
+      )}
+
+      {error && <p className="error">{error}</p>}
+
+      <div className="account-details">
+        <div className="detail-section">
+          <label htmlFor="name-input">Name:</label>
+          {!isEditing ? (
+            <p className="detail-value">{account.name}</p>
+          ) : (
+            <input
+              id="name-input"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Account name"
+            />
+          )}
+        </div>
+
+        <div className="detail-section">
+          <label htmlFor="type-input">Type:</label>
+          {!isEditing ? (
+            <p className="detail-value">{account.type}</p>
+          ) : (
+            <select
+              id="type-input"
+              value={type}
+              onChange={e => setType(e.target.value as 'checking' | 'savings' | 'credit')}
+            >
+              <option value="checking">Checking</option>
+              <option value="savings">Savings</option>
+              <option value="credit">Credit</option>
+            </select>
+          )}
+        </div>
+
+        <div className="detail-section">
+          <label htmlFor="balance-input">Balance:</label>
+          {!isEditing ? (
+            <p className="detail-value">${Number(account.starting_balance).toFixed(2)}</p>
+          ) : (
             <input
               id="balance-input"
               type="number"
@@ -106,30 +146,19 @@ export function AccountDetailPage() {
               onChange={e => setBalance(e.target.value === '' ? '' : Number(e.target.value))}
               placeholder="0.00"
             />
-            <button onClick={handleUpdateBalance}>Save Balance</button>
-            <button onClick={handleCancelBalance} className="btn-cancel">
+          )}
+        </div>
+
+        {isEditing && (
+          <div className="action-buttons">
+            <button onClick={handleSaveChanges} className="btn-primary">
+              Save Changes
+            </button>
+            <button onClick={handleCancel} className="btn-cancel">
               Cancel
             </button>
           </div>
         )}
-      </div>
-
-      {error && <p className="error">{error}</p>}
-
-      <div className="account-actions">
-        <div className="name-section">
-          <label htmlFor="name-input">Account Name:</label>
-          <input
-            id="name-input"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="Account name"
-          />
-          <button onClick={handleRename}>Save Name</button>
-        </div>
-        <button onClick={handleDelete} className="btn-delete">
-          Delete Account
-        </button>
       </div>
 
       <h2>Transactions</h2>
@@ -141,7 +170,7 @@ export function AccountDetailPage() {
               <div>
                 <strong>{tx.description}</strong>
                 <br />
-                <span className="transaction-date">{tx.occurred_at}</span>
+                <span className="transaction-date">{formatDate(tx.occurred_at)}</span>
               </div>
               <span className="transaction-amount">${Number(tx.amount).toFixed(2)}</span>
             </li>
@@ -151,3 +180,5 @@ export function AccountDetailPage() {
     </div>
   )
 }
+
+
