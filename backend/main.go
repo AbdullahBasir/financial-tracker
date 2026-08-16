@@ -37,7 +37,7 @@ func main() {
 
 	router.Handle("POST /budgets", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateBudget)))
 	router.Handle("GET /budgets", middleware.Auth(http.HandlerFunc(cfg.HandlerGetBudgets)))
-	router.Handle("DELETE /budgets/summary", middleware.Auth(http.HandlerFunc(cfg.HandlerGetSumBudgets)))
+	router.Handle("GET /budgets/summary", middleware.Auth(http.HandlerFunc(cfg.HandlerGetSumBudgets)))
 
 	var app http.Handler = router
 	app = middleware.Chain(router, middleware.CORS, middleware.Logger, middleware.Recoverer)
