@@ -38,6 +38,15 @@ export function CategoriesPage() {
     }
   }
 
+  async function handleDelete(id: string) {
+    try {
+      await categoryService.remove(id)
+      setCategories(prev => prev.filter(a => a.id !== id))
+    } catch (err) {
+      setError((err as Error).message)
+    }
+  }
+
   return (
     <div>
       <h1>Categories</h1>
@@ -62,7 +71,7 @@ export function CategoriesPage() {
       ) : (
         <ul>
           {categories.map(c => (
-            <li key={c.id}>{c.name} ({c.type})</li>
+            <li key={c.id}>{c.name} ({c.type}) <td><button onClick={() => handleDelete(c.id)}>Delete</button></td></li>
           ))}
         </ul>
       )}

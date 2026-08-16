@@ -11,4 +11,5 @@ export interface Category {
 export const categoryService = {
   list: (): Promise<Category[]> => api.get('/categories'),
   create: (data: Pick<Category, 'name' | 'type'>): Promise<Category> => api.post('/categories', data),
+  remove: (id: string): Promise<void> => api.del(`/categories/${id}`),
 }
