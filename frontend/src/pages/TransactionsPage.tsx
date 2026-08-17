@@ -145,7 +145,7 @@ export function TransactionsPage() {
           value={filters.account_id}
           onChange={e => setFilters(f => ({ ...f, account_id: e.target.value }))}
         >
-          <option value="" disabled>Accounts</option>
+          <option value="">Accounts</option>
           {accounts.map(a => (
             <option key={a.id} value={a.id}>{a.name}</option>
           ))}

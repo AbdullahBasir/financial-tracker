@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -31,44 +32,44 @@ func (cfg *apiConfig) HandlerGetTransactions(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var accountFilter uuid.UUID
+	var accountFilter uuid.NullUUID
 	if accountID != "" {
-		account, validation := cfg.AccountValidation(accountID, r)
-		if validation != nil {
-			RespondWithError(w, validation.Code, validation.Message)
+		accID, err := uuid.Parse(accountID)
+		if err != nil {
+			RespondWithError(w, http.StatusBadRequest, "invalid account_id format")
 			return
 		}
-		accountFilter = account.ID
+		accountFilter = uuid.NullUUID{UUID: accID, Valid: true}
 	}
 
-	var parsedCategoryID uuid.UUID
+	var categoryFilter uuid.NullUUID
 	if categoryID != "" {
 		catID, err := uuid.Parse(categoryID)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "invalid category_id format")
 			return
 		}
-		parsedCategoryID = catID
+		categoryFilter = uuid.NullUUID{UUID: catID, Valid: true}
 	}
 
-	var fromDate time.Time
+	var fromFilter sql.NullTime
 	if from != "" {
 		fDate, err := time.Parse("2006-01-02", from)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "invalid from date format (use YYYY-MM-DD)")
 			return
 		}
-		fromDate = fDate
+		fromFilter = sql.NullTime{Time: fDate, Valid: true}
 	}
 
-	var toDate time.Time
+	var toFilter sql.NullTime
 	if to != "" {
 		tDate, err := time.Parse("2006-01-02", to)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "invalid to date format (use YYYY-MM-DD)")
 			return
 		}
-		toDate = tDate
+		toFilter = sql.NullTime{Time: tDate, Valid: true}
 	}
 
 	page := int32(1)
@@ -85,54 +86,39 @@ func (cfg *apiConfig) HandlerGetTransactions(w http.ResponseWriter, r *http.Requ
 	offset := (page - 1) * int32(pageSize)
 
 	transactions, err := cfg.dbQueries.GetTransactions(r.Context(), sqlc.GetTransactionsParams{
-		UserID:  userID,
-		Column2: accountFilter,
-		Limit:   int32(pageSize),
-		Offset:  offset,
+		UserID:     userID,
+		AccountID:  accountFilter,
+		CategoryID: categoryFilter,
+		FromDate:   fromFilter,
+		ToDate:     toFilter,
+		Limit:      int32(pageSize),
+		Offset:     offset,
 	})
 	if err != nil {
-		slog.Error("failed to retrieve transactions from database",
-			"error", err,
-			"account_id", accountFilter,
-		)
+		slog.Error("failed to retrieve transactions from database", "error", err, "user_id", userID)
 		RespondWithError(w, http.StatusInternalServerError, "could not fetch transactions")
 		return
 	}
 
-	filtered := []Transaction{}
-	for _, transaction := range transactions {
-		if categoryID != "" {
-			if !transaction.CategoryID.Valid || transaction.CategoryID.UUID != parsedCategoryID {
-				continue
-			}
-		}
-		if from != "" && transaction.OccurredAt.Before(fromDate) {
-			continue
-		}
-		if to != "" && transaction.OccurredAt.After(toDate) {
-			continue
-		}
+	result := make([]Transaction, 0, len(transactions))
+	for _, t := range transactions {
 		var categoryIDPtr *uuid.UUID
-		if transaction.CategoryID.Valid {
-			categoryIDPtr = &transaction.CategoryID.UUID
+		if t.CategoryID.Valid {
+			categoryIDPtr = &t.CategoryID.UUID
 		}
-		filtered = append(filtered, Transaction{
-			ID:          transaction.ID,
-			Amount:      transaction.Amount,
-			CreatedAt:   transaction.CreatedAt,
-			OccurredAt:  transaction.OccurredAt,
-			Description: transaction.Description.String,
-			AccountID:   transaction.AccountID,
+		result = append(result, Transaction{
+			ID:          t.ID,
+			Amount:      t.Amount,
+			CreatedAt:   t.CreatedAt,
+			OccurredAt:  t.OccurredAt,
+			Description: t.Description.String,
+			AccountID:   t.AccountID,
 			CategoryID:  categoryIDPtr,
 		})
 	}
 
-	if filtered == nil {
-		filtered = []Transaction{}
-	}
-
 	RespondWithJSON(w, http.StatusOK, TransactionPage{
-		Transaction: filtered,
+		Transaction: result,
 		Page:        page,
 		PageSize:    pageSize,
 	})

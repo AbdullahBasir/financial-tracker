@@ -43,7 +43,7 @@ Finance Tracker is a portfolio-grade project that demonstrates full-stack develo
 1. PostgreSQL must be running and accessible
 2. Create a `.env` file in the `backend/` directory:
    ```env
-   DATABASE_URL=postgres://username:password@localhost:5432/finance_tracker
+   DATABASE_URL=postgres://username:password@localhost:5432/finance_tracker?sslmode=disable
    PORT=8080
    JWT_SECRET=your_jwt_secret_key_here
    ```
@@ -53,7 +53,14 @@ Finance Tracker is a portfolio-grade project that demonstrates full-stack develo
 
 ## Installation
 
-### 1. Clone the Repository
+### 1. Install the Repository
+```bash
+git install github.com/AbdullahBasir/financial-tracker@latest
+```
+This compiles and places the binary in $GOPATH/bin (usually ~/go/bin). Make sure ~/go/bin is in your PATH.
+
+or clone the repository
+
 ```bash
 git clone https://github.com/AbdullahBasir/financial-tracker.git
 cd finance-tracker

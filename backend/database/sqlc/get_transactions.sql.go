@@ -7,32 +7,43 @@ package sqlc
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
 
 const getTransactions = `-- name: GetTransactions :many
-SELECT t.id, t.amount, t.created_at, t.occurred_at, t.description, t.account_id, t.category_id FROM transactions t
+SELECT t.id, t.amount, t.created_at, t.occurred_at, t.description, t.account_id, t.category_id
+FROM transactions t
 JOIN accounts a ON t.account_id = a.id
 WHERE a.user_id = $1
-  AND ($2::uuid IS NULL OR t.account_id = $2)
+  AND ($4::uuid IS NULL OR t.account_id = $4)
+  AND ($5::uuid IS NULL OR t.category_id = $5)
+  AND ($6::timestamptz IS NULL OR t.occurred_at >= $6)
+  AND ($7::timestamptz IS NULL OR t.occurred_at <= $7)
 ORDER BY t.occurred_at DESC
-LIMIT $3 OFFSET $4
+LIMIT $2 OFFSET $3
 `
 
 type GetTransactionsParams struct {
-	UserID  uuid.UUID
-	Column2 uuid.UUID
-	Limit   int32
-	Offset  int32
+	UserID     uuid.UUID
+	Limit      int32
+	Offset     int32
+	AccountID  uuid.NullUUID
+	CategoryID uuid.NullUUID
+	FromDate   sql.NullTime
+	ToDate     sql.NullTime
 }
 
 func (q *Queries) GetTransactions(ctx context.Context, arg GetTransactionsParams) ([]Transaction, error) {
 	rows, err := q.db.QueryContext(ctx, getTransactions,
 		arg.UserID,
-		arg.Column2,
 		arg.Limit,
 		arg.Offset,
+		arg.AccountID,
+		arg.CategoryID,
+		arg.FromDate,
+		arg.ToDate,
 	)
 	if err != nil {
 		return nil, err
