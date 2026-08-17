@@ -14,8 +14,8 @@ export function Layout() {
       <nav>
         <NavLink to="/dashboard">Dashboard</NavLink>
         <NavLink to="/accounts">Accounts</NavLink>
-        <NavLink to="/transactions">Transactions</NavLink>
         <NavLink to="/categories">Categories</NavLink>
+        <NavLink to="/transactions">Transactions</NavLink>
         <NavLink to="/budgets">Budgets</NavLink>
         <button onClick={handleLogout}>Logout</button>
       </nav>
