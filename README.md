@@ -55,8 +55,9 @@ Finance Tracker is a portfolio-grade project that demonstrates full-stack develo
 
 ### 1. Install the Repository
 ```bash
-git install github.com/AbdullahBasir/financial-tracker@v1.0.0
+go install github.com/AbdullahBasir/financial-tracker@latest
 ```
+This compiles and places the binary in $GOPATH/bin (usually ~/go/bin). Make sure ~/go/bin is in your PATH.
 
 or clone the repository
 
