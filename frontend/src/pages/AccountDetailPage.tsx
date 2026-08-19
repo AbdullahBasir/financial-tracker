@@ -5,6 +5,8 @@ import { accountService } from '../services/accounts'
 import type { Account } from '../services/accounts'
 import { transactionService } from '../services/transactions'
 import type { Transaction } from '../services/transactions'
+import { categoryService } from '../services/categories'
+import type { Category } from '../services/categories'
 import { formatDate } from '../lib/format'
 
 export function AccountDetailPage() {
@@ -12,6 +14,7 @@ export function AccountDetailPage() {
 
   const [account, setAccount] = useState<Account | null>(null)
   const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [name, setName] = useState('')
   const [type, setType] = useState<'checking' | 'savings' | 'credit'>('credit')
   const [starting_balance, setBalance] = useState<number | ''>('')
@@ -31,11 +34,13 @@ export function AccountDetailPage() {
         accountService.get(accountId),
         transactionService.list({ account_id: accountId }),
       ])
+      const categoryResult = await categoryService.list()
       setAccount(acc)
       setName(acc.name)
       setType(acc.type)
       setBalance(Number(acc.starting_balance))
       setTransactions(txResult.transaction)
+      setCategories(categoryResult)
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -169,16 +174,21 @@ export function AccountDetailPage() {
       {transactions.length === 0 && <p className="empty-state">No transactions for this account.</p>}
       {transactions.length > 0 && (
         <ul>
-          {transactions.map(tx => (
+          {transactions.map(tx => {
+            const categoryType = categories.find(category => category.id === tx.category_id)?.type
+            return (
             <li key={tx.id}>
               <div>
                 <strong>{tx.description}</strong>
                 <br />
                 <span className="transaction-date">{formatDate(tx.occurred_at)}</span>
               </div>
-              <span className="transaction-amount">${Number(tx.amount).toFixed(2)}</span>
+              <span className={`transaction-amount${categoryType ? ` transaction-amount-${categoryType}` : ''}`}>
+                ${Number(tx.amount).toFixed(2)}
+              </span>
             </li>
-          ))}
+            )
+          })}
         </ul>
       )}
     </div>

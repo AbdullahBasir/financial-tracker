@@ -452,6 +452,14 @@ form {
   color: var(--color-ink-secondary);
 }
 
+.transaction-amount-income {
+  color: #15803d;
+}
+
+.transaction-amount-expenses {
+  color: var(--color-error);
+}
+
 .form-error {
   margin-bottom: var(--space-3);
 }

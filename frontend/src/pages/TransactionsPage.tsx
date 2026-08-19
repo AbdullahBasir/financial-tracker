@@ -276,11 +276,14 @@ export function TransactionsPage() {
             <tbody>
               {transactions.map(tx => {
                 const amount = Number(tx.amount)
+                const categoryType = categories.find(category => category.id === tx.category_id)?.type
                 return (
                   <tr key={tx.id}>
                     <td>{formatDate(tx.occurred_at)}</td>
                     <td>{tx.description}</td>
-                    <td>${amount.toFixed(2)}</td>
+                    <td className={categoryType ? `transaction-amount-${categoryType}` : undefined}>
+                      ${amount.toFixed(2)}
+                    </td>
                     <td><button onClick={() => handleDelete(tx.id)}>Delete</button></td>
                   </tr>
                 )
