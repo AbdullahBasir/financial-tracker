@@ -15,6 +15,7 @@ export interface TransactionPageResult {
   transaction: Transaction[]
   page: number
   page_size: number
+  total_count: number
 }
 
 export interface TransactionFilters {
@@ -33,6 +34,7 @@ export const transactionService = {
       transaction: result.transaction ?? [],
       page: result.page ?? 1,
       page_size: result.page_size ?? 10,
+      total_count: result.total_count ?? 0,
     }
   },
   get: (id: string): Promise<Transaction> => api.get(`/transactions/${id}`),

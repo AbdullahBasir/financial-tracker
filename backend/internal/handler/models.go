@@ -76,4 +76,5 @@ type TransactionPage struct {
 	Transaction []Transaction `json:"transaction"`
 	Page        int32         `json:"page"`
 	PageSize    int           `json:"page_size"`
+	TotalCount  int64         `json:"total_count"`
 }

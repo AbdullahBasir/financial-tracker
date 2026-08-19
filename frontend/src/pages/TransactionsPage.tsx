@@ -56,7 +56,8 @@ export function TransactionsPage() {
   // Pagination
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [hasNextPage, setHasNextPage] = useState(false)
+  const [totalCount, setTotalCount] = useState(0)
+  const hasNextPage = page * pageSize < totalCount
 
   const [form, setForm] = useState<TransactionFormState>(EMPTY_FORM)
   const [formError, setFormError] = useState('')
@@ -79,7 +80,7 @@ export function TransactionsPage() {
         if (!cancelled) {
           setTransactions(result.transaction)
           setPageSize(result.page_size)
-          setHasNextPage(result.transaction.length === result.page_size)
+          setTotalCount(result.total_count)
         }
       } catch (err) {
         if (!cancelled) setError((err as Error).message)
@@ -124,6 +125,7 @@ export function TransactionsPage() {
       })
       setTransactions(prev => [newTx, ...prev])
       setForm(EMPTY_FORM)
+      setTotalCount(prev => prev + 1)
     } catch (err) {
       setError((err as Error).message)
     }
@@ -132,7 +134,13 @@ export function TransactionsPage() {
   async function handleDelete(id: string) {
     try {
       await transactionService.remove(id)
-      setTransactions(prev => prev.filter(t => t.id !== id))
+      const result = await transactionService.list(toCleanFilters(filters, page))
+      setTransactions(result.transaction)
+      setPageSize(result.page_size)
+      setTotalCount(result.total_count)
+      if (result.transaction.length === 0 && page > 1) {
+        setPage(p => p - 1)
+      }
     } catch (err) {
       setError((err as Error).message)
     }
@@ -278,7 +286,7 @@ export function TransactionsPage() {
             >
               Previous
             </button>
-            <span>Page {page} · {pageSize} per page</span>  
+            <span>Page {page} · {pageSize} per page</span>
             <button
               onClick={() => setPage(p => p + 1)}
               disabled={!hasNextPage}

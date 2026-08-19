@@ -117,9 +117,23 @@ func (cfg *apiConfig) HandlerGetTransactions(w http.ResponseWriter, r *http.Requ
 		})
 	}
 
+	pageCount, err := cfg.dbQueries.CountTransactions(r.Context(), sqlc.CountTransactionsParams{
+		UserID:     userID,
+		AccountID:  accountFilter,
+		CategoryID: categoryFilter,
+		FromDate:   fromFilter,
+		ToDate:     toFilter,
+	})
+	if err != nil {
+		slog.Error("failed to retrieve number of transactions from database", "error", err, "user_id", userID)
+		RespondWithError(w, http.StatusInternalServerError, "could not fetch number of transactions")
+		return
+	}
+
 	RespondWithJSON(w, http.StatusOK, TransactionPage{
 		Transaction: result,
 		Page:        page,
 		PageSize:    pageSize,
+		TotalCount:  pageCount,
 	})
 }
