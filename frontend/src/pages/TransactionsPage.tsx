@@ -8,6 +8,7 @@ import type { Category } from '../services/categories'
 import { accountService } from '../services/accounts'
 import type { Account } from '../services/accounts'
 import { formatDate } from '../lib/format'
+import { ApiError } from '../lib/api'
 
 interface TransactionFilters {
   account_id: string
@@ -127,7 +128,15 @@ export function TransactionsPage() {
       setForm(EMPTY_FORM)
       setTotalCount(prev => prev + 1)
     } catch (err) {
-      setError((err as Error).message)
+      if (
+        err instanceof ApiError &&
+        err.status === 400 &&
+        err.message === 'transaction cannot be in the future'
+      ) {
+        setFormError('Transaction dates cannot be in the future. Please choose today or an earlier date.')
+      } else {
+        setError((err as Error).message)
+      }
     }
   }
 

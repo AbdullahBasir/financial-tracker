@@ -12,7 +12,7 @@ import (
 )
 
 const getCategory = `-- name: GetCategory :one
-SELECT id, name, created_at, type, user_id FROM categories
+SELECT id, name, created_at, type, user_id, archived_at FROM categories
 WHERE id = $1
 `
 
@@ -25,6 +25,7 @@ func (q *Queries) GetCategory(ctx context.Context, id uuid.UUID) (Category, erro
 		&i.CreatedAt,
 		&i.Type,
 		&i.UserID,
+		&i.ArchivedAt,
 	)
 	return i, err
 }

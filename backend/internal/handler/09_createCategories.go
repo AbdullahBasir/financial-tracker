@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -47,6 +49,10 @@ func (cfg *apiConfig) HandlerCreateCategory(w http.ResponseWriter, r *http.Reque
 		UserID: userID,
 	})
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			RespondWithError(w, http.StatusConflict, "category already exists")
+			return
+		}
 		if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "UNIQUE constraint") {
 			RespondWithError(w, http.StatusConflict, "category already exists")
 			return

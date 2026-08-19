@@ -11,17 +11,18 @@ import (
 	"github.com/google/uuid"
 )
 
-const deleteCategory = `-- name: DeleteCategory :exec
-DELETE FROM categories
-WHERE id = $1 AND user_id = $2
+const archiveCategory = `-- name: ArchiveCategory :exec
+UPDATE categories
+SET archived_at = CURRENT_TIMESTAMP
+WHERE id = $1 AND user_id = $2 AND archived_at IS NULL
 `
 
-type DeleteCategoryParams struct {
+type ArchiveCategoryParams struct {
 	ID     uuid.UUID
 	UserID uuid.UUID
 }
 
-func (q *Queries) DeleteCategory(ctx context.Context, arg DeleteCategoryParams) error {
-	_, err := q.db.ExecContext(ctx, deleteCategory, arg.ID, arg.UserID)
+func (q *Queries) ArchiveCategory(ctx context.Context, arg ArchiveCategoryParams) error {
+	_, err := q.db.ExecContext(ctx, archiveCategory, arg.ID, arg.UserID)
 	return err
 }

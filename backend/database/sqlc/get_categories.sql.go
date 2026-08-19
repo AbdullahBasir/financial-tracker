@@ -12,7 +12,7 @@ import (
 )
 
 const getCategories = `-- name: GetCategories :many
-SELECT id, name, created_at, type, user_id FROM categories WHERE user_id = $1 
+SELECT id, name, created_at, type, user_id, archived_at FROM categories WHERE user_id = $1 AND archived_at IS NULL
 ORDER BY created_at DESC
 `
 
@@ -31,6 +31,7 @@ func (q *Queries) GetCategories(ctx context.Context, userID uuid.UUID) ([]Catego
 			&i.CreatedAt,
 			&i.Type,
 			&i.UserID,
+			&i.ArchivedAt,
 		); err != nil {
 			return nil, err
 		}

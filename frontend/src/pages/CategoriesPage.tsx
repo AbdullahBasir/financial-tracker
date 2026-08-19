@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { SyntheticEvent } from 'react'
 import { categoryService } from '../services/categories'
 import type { Category } from '../services/categories'
+import { ApiError } from '../lib/api'
 
 export function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -34,7 +35,11 @@ export function CategoriesPage() {
       setCategories(prev => [...prev, newCategory])
       setName('')
     } catch (err) {
-      setError((err as Error).message)
+      if (err instanceof ApiError && err.status === 409) {
+        setError('A category with this name already exists. Category names must use the same type.')
+      } else {
+        setError((err as Error).message)
+      }
     }
   }
 
@@ -71,7 +76,7 @@ export function CategoriesPage() {
       ) : (
         <ul>
           {categories.map(c => (
-            <li key={c.id}>{c.name} ({c.type}) <td><button onClick={() => handleDelete(c.id)}>Delete</button></td></li>
+            <li key={c.id}>{c.name} ({c.type}) <td><button onClick={() => handleDelete(c.id)}>Archive</button></td></li>
           ))}
         </ul>
       )}

@@ -35,23 +35,14 @@ func (cfg *apiConfig) HandlerDeleteCategory(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	category, err := cfg.dbQueries.GetCategory(r.Context(), CategoryID)
-	if err != nil {
-		slog.Error("failed to retrieve category from database",
-			"error", err,
-		)
-		RespondWithError(w, http.StatusInternalServerError, "could not retrieve category")
-		return
-	}
-
-	err = cfg.dbQueries.DeleteCategory(r.Context(), sqlc.DeleteCategoryParams{
-		ID:     category.ID,
+	err = cfg.dbQueries.ArchiveCategory(r.Context(), sqlc.ArchiveCategoryParams{
+		ID:     CategoryID,
 		UserID: userID,
 	})
 	if err != nil {
 		slog.Error("failed to delete category from database",
 			"error", err,
-			"category_id", category.ID,
+			"category_id", CategoryID,
 		)
 		RespondWithError(w, http.StatusInternalServerError, "could not delete category")
 		return

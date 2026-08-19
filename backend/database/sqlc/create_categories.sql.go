@@ -19,7 +19,11 @@ VALUES (
     $2,
     $3
 )
-RETURNING id, name, created_at, type, user_id
+ON CONFLICT (user_id, name) DO UPDATE
+SET archived_at = NULL
+WHERE categories.archived_at IS NOT NULL
+    AND categories.type = EXCLUDED.type
+RETURNING id, name, created_at, type, user_id, archived_at
 `
 
 type CreateCategoryParams struct {
@@ -37,6 +41,7 @@ func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) 
 		&i.CreatedAt,
 		&i.Type,
 		&i.UserID,
+		&i.ArchivedAt,
 	)
 	return i, err
 }
