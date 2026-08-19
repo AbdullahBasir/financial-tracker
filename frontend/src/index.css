@@ -463,3 +463,16 @@ form {
   color: var(--color-ink-muted);
 }
 
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  justify-content: center;
+}
+
+.pagination span {
+  font-size: 0.9rem;
+  color: var(--color-ink-secondary);
+}
+

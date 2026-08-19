@@ -1,3 +1,4 @@
+// src/services/transactions.ts
 import { api } from '../lib/api'
 
 export interface Transaction {
@@ -10,10 +11,10 @@ export interface Transaction {
   category_id: string
 }
 
-export interface TransactionPage {
-  transaction?: Transaction[]
-  page?: number
-  page_size?: number
+export interface TransactionPageResult {
+  transaction: Transaction[]
+  page: number
+  page_size: number
 }
 
 export interface TransactionFilters {
@@ -25,10 +26,14 @@ export interface TransactionFilters {
 }
 
 export const transactionService = {
-  list: async (filters: TransactionFilters = {}): Promise<Transaction[]> => {
+  list: async (filters: TransactionFilters = {}): Promise<TransactionPageResult> => {
     const params = new URLSearchParams(filters as Record<string, string>)
-    const result: TransactionPage = await api.get(`/transactions?${params}`)
-    return result.transaction ?? result.transaction ?? []
+    const result = await api.get(`/transactions?${params}`)
+    return {
+      transaction: result.transaction ?? [],
+      page: result.page ?? 1,
+      page_size: result.page_size ?? 10,
+    }
   },
   get: (id: string): Promise<Transaction> => api.get(`/transactions/${id}`),
   create: (data: Pick<Transaction, 'account_id' | 'category_id' | 'amount' | 'description' | 'occurred_at'>): Promise<Transaction> =>

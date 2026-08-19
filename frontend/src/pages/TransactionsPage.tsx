@@ -32,21 +32,20 @@ const EMPTY_FORM: TransactionFormState = {
   occurredAt: '',
 }
 
-function toCleanFilters(filters: TransactionFilters) {
-  return Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== ''))
+function toCleanFilters(filters: TransactionFilters, page: number) {
+  return Object.fromEntries(
+    Object.entries({ ...filters, page: String(page) }).filter(([, v]) => v !== '')
+  )
 }
 
 export function TransactionsPage() {
-  // Data
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [accounts, setAccounts] = useState<Account[]>([])
 
-  // Page state
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // Filters
   const [filters, setFilters] = useState<TransactionFilters>({
     account_id: '',
     category_id: '',
@@ -54,7 +53,11 @@ export function TransactionsPage() {
     to: '',
   })
 
-  // Add-transaction form
+  // Pagination
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [hasNextPage, setHasNextPage] = useState(false)
+
   const [form, setForm] = useState<TransactionFormState>(EMPTY_FORM)
   const [formError, setFormError] = useState('')
 
@@ -63,13 +66,21 @@ export function TransactionsPage() {
   }, [])
 
   useEffect(() => {
+    setPage(1)
+  }, [filters])
+
+  useEffect(() => {
     let cancelled = false
 
     async function load() {
       try {
         setLoading(true)
-        const data = await transactionService.list(toCleanFilters(filters))
-        if (!cancelled) setTransactions(data)
+        const result = await transactionService.list(toCleanFilters(filters, page))
+        if (!cancelled) {
+          setTransactions(result.transaction)
+          setPageSize(result.page_size)
+          setHasNextPage(result.transaction.length === result.page_size)
+        }
       } catch (err) {
         if (!cancelled) setError((err as Error).message)
       } finally {
@@ -81,7 +92,7 @@ export function TransactionsPage() {
     return () => {
       cancelled = true
     }
-  }, [filters])
+  }, [filters, page])
 
   async function loadStaticData() {
     try {
@@ -235,29 +246,47 @@ export function TransactionsPage() {
       )}
 
       {!loading && transactions.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Amount</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-          {transactions.map(tx => {
-            const amount = Number(tx.amount)
-            return (
-              <tr key={tx.id}>
-                <td>{formatDate(tx.occurred_at)}</td>
-                <td>{tx.description}</td>
-                <td>${amount.toFixed(2)}</td>
-                <td><button onClick={() => handleDelete(tx.id)}>Delete</button></td>
+        <>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th></th>
               </tr>
-            )
-          })}
-        </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {transactions.map(tx => {
+                const amount = Number(tx.amount)
+                return (
+                  <tr key={tx.id}>
+                    <td>{formatDate(tx.occurred_at)}</td>
+                    <td>{tx.description}</td>
+                    <td>${amount.toFixed(2)}</td>
+                    <td><button onClick={() => handleDelete(tx.id)}>Delete</button></td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+
+          <div className="pagination">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </button>
+            <span>Page {page} · {pageSize} per page</span>  
+            <button
+              onClick={() => setPage(p => p + 1)}
+              disabled={!hasNextPage}
+            >
+              Next
+            </button>
+          </div>
+        </>
       )}
     </div>
   )

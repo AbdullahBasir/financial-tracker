@@ -27,7 +27,7 @@ export function AccountDetailPage() {
   async function loadData(accountId: string) {
     try {
       setLoading(true)
-      const [acc, txs] = await Promise.all([
+      const [acc, txResult] = await Promise.all([
         accountService.get(accountId),
         transactionService.list({ account_id: accountId }),
       ])
@@ -35,7 +35,7 @@ export function AccountDetailPage() {
       setName(acc.name)
       setType(acc.type)
       setBalance(Number(acc.starting_balance))
-      setTransactions(txs)
+      setTransactions(txResult.transaction)
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -79,6 +79,8 @@ export function AccountDetailPage() {
 
   if (loading) return <p>Loading account...</p>
   if (!account) return <p>Account not found.</p>
+
+  const balance = Number(account.starting_balance)
 
   return (
     <div>
@@ -136,7 +138,9 @@ export function AccountDetailPage() {
         <div className="detail-section">
           <label htmlFor="balance-input">Balance:</label>
           {!isEditing ? (
-            <p className="detail-value">${Number(account.starting_balance).toFixed(2)}</p>
+            <p className={`detail-value${balance < 0 ? ' balance-negative' : ''}`}>
+              ${balance.toFixed(2)}
+            </p>
           ) : (
             <input
               id="balance-input"
