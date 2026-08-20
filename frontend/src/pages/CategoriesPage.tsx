@@ -120,7 +120,7 @@ export function CategoriesPage() {
                   <button type="button" onClick={() => handleSaveEdit(c.id)} disabled={!editName.trim()}>
                     Save
                   </button>
-                  <button type="button" onClick={handleCancelEdit}>
+                  <button className="btn-cancel" onClick={handleCancelEdit}>
                     Cancel
                   </button>
                 </>

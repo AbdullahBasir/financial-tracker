@@ -288,7 +288,11 @@ export function TransactionsPage() {
                     <td className={categoryType ? `transaction-amount-${categoryType}` : undefined}>
                       ${amount.toFixed(2)}
                     </td>
-                    <td><button onClick={() => handleDelete(tx.id)}>Delete</button></td>
+                    <td>
+                      <button type="button" className="btn-delete" onClick={() => handleDelete(tx.id)}>
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 )
               })}
