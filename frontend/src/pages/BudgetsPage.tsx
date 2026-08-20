@@ -22,10 +22,6 @@ export function BudgetsPage() {
     month: currentMonth(),
   })
 
-  useEffect(() => {
-    loadData()
-  }, [])
-
   async function loadData() {
     try {
       setLoading(true)
@@ -41,6 +37,13 @@ export function BudgetsPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    async function load() {
+      await loadData()
+    }
+    load()
+  }, [])
 
   async function handleCreate(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()

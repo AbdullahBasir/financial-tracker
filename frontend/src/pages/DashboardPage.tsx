@@ -13,10 +13,6 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    loadSummary(month)
-  }, [month])
-
   async function loadSummary(m: string) {
     try {
       setLoading(true)
@@ -29,6 +25,13 @@ export function DashboardPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    async function load() {
+      await loadSummary(month)
+    }
+    load()
+  }, [month])
 
   return (
     <div>

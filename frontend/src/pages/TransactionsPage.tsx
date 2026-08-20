@@ -64,14 +64,6 @@ export function TransactionsPage() {
   const [formError, setFormError] = useState('')
 
   useEffect(() => {
-    loadStaticData()
-  }, [])
-
-  useEffect(() => {
-    setPage(1)
-  }, [filters])
-
-  useEffect(() => {
     let cancelled = false
 
     async function load() {
@@ -104,6 +96,18 @@ export function TransactionsPage() {
     } catch (err) {
       setError((err as Error).message)
     }
+  }
+
+  useEffect(() => {
+    async function load() {
+      await loadStaticData()
+    }
+    load()
+  }, [])
+
+  function updateFilters(nextFilters: TransactionFilters) {
+    setPage(1)
+    setFilters(nextFilters)
   }
 
   async function handleCreate(e: SyntheticEvent<HTMLFormElement>) {
@@ -171,7 +175,7 @@ export function TransactionsPage() {
         <h2>Filters</h2>
         <select
           value={filters.account_id}
-          onChange={e => setFilters(f => ({ ...f, account_id: e.target.value }))}
+          onChange={e => updateFilters({ ...filters, account_id: e.target.value })}
         >
           <option value="">Accounts</option>
           {accounts.map(a => (
@@ -181,7 +185,7 @@ export function TransactionsPage() {
 
         <select
           value={filters.category_id}
-          onChange={e => setFilters(f => ({ ...f, category_id: e.target.value }))}
+          onChange={e => updateFilters({ ...filters, category_id: e.target.value })}
         >
           <option value="">Categories</option>
           {categories.map(c => (
@@ -192,12 +196,12 @@ export function TransactionsPage() {
         <input
           type="date"
           value={filters.from}
-          onChange={e => setFilters(f => ({ ...f, from: e.target.value }))}
+          onChange={e => updateFilters({ ...filters, from: e.target.value })}
         />
         <input
           type="date"
           value={filters.to}
-          onChange={e => setFilters(f => ({ ...f, to: e.target.value }))}
+          onChange={e => updateFilters({ ...filters, to: e.target.value })}
         />
       </section>
 

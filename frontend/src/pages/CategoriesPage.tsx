@@ -11,10 +11,6 @@ export function CategoriesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    loadCategories()
-  }, [])
-
   async function loadCategories() {
     try {
       setLoading(true)
@@ -26,6 +22,13 @@ export function CategoriesPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    async function load() {
+      await loadCategories()
+    }
+    load()
+  }, [])
 
   async function handleCreate(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()

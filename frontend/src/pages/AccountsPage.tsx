@@ -10,10 +10,6 @@ export function AccountsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    loadAccounts()
-  }, [])
-
   async function loadAccounts() {
     try {
       setLoading(true)
@@ -25,6 +21,13 @@ export function AccountsPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    async function load() {
+      await loadAccounts()
+    }
+    load()
+  }, [])
 
   async function handleCreate(e: SyntheticEvent<HTMLFormElement>) {
   e.preventDefault()

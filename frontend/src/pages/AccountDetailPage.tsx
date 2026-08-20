@@ -22,11 +22,6 @@ export function AccountDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (!id) return
-    loadData(id)
-  }, [id])
-
   async function loadData(accountId: string) {
     try {
       setLoading(true)
@@ -47,6 +42,15 @@ export function AccountDetailPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!id) return
+    const accountId = id
+    async function load() {
+      await loadData(accountId)
+    }
+    load()
+  }, [id])
 
   async function handleSaveChanges() {
     if (!id) return
