@@ -39,7 +39,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/finance_tracker_test?sslmode=disable
+      DB_URL: postgres://postgres:postgres@localhost:5432/finance_tracker_test?sslmode=disable
       JWT_SECRET: ci-test-secret-not-for-production
       PORT: 8080
 

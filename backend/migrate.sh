@@ -8,13 +8,10 @@ if [[ -f "$ENV_FILE" ]]; then
   set -a
   source "$ENV_FILE"
   set +a
-else
-  echo "Error: .env file not found at $ENV_FILE"
-  exit 1
 fi
 
 if [[ -z "${DB_URL:-}" ]]; then
-  echo "Error: DB_URL is not set. Add it to your .env file."
+  echo "Error: DB_URL is not set. Define it in .env or the environment."
   exit 1
 fi
 
