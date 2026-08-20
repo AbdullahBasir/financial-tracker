@@ -38,4 +38,5 @@ export const budgetService = {
     const result: BudgetSummaryResponse = await api.get(`/budgets/summary?month=${month}`)
     return result.items ?? []
   },
+  remove: (id: string): Promise<void> => api.del(`/budgets/${id}`),
 }

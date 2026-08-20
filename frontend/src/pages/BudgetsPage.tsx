@@ -60,6 +60,15 @@ export function BudgetsPage() {
     }
   }
 
+  async function handleDelete(id: string) {
+      try {
+        await budgetService.remove(id)
+        setBudgets(prev => prev.filter(a => a.id !== id))
+      } catch (err) {
+        setError((err as Error).message)
+      }
+    }
+
   function categoryName(id: string) {
     return categories.find(c => c.id === id)?.name ?? 'Unknown'
   }
@@ -76,7 +85,7 @@ export function BudgetsPage() {
           required
         >
           <option value="" disabled>Category</option>
-          {categories.map(c => (
+          {categories.filter(c => c.type === 'expenses').map(c => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
@@ -109,6 +118,7 @@ export function BudgetsPage() {
               <th>Category</th>
               <th>Month</th>
               <th>Limit</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -117,6 +127,9 @@ export function BudgetsPage() {
                 <td>{categoryName(b.category_id)}</td>
                 <td>{b.month}</td>
                 <td>${Number(b.monthly_limit).toFixed(2)}</td>
+                <td>
+                  <button className="btn-delete" onClick={() => handleDelete(b.id)}>Delete</button>
+                </td>
               </tr>
             ))}
           </tbody>

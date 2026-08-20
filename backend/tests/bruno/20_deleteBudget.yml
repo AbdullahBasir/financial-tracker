@@ -1,0 +1,26 @@
+info:
+  name: 20_deleteBudget
+  type: http
+  seq: 20
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/budgets/{{budgetId}}"
+  headers:
+    - name: Authorization
+      value: Bearer {{auth_token}}
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        expect(res.status).to.equal(204);
+
+        console.log('Budget deleted');
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
