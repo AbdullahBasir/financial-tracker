@@ -6,8 +6,4 @@ VALUES (
     $2,
     $3
 )
-ON CONFLICT (user_id, name) DO UPDATE
-SET archived_at = NULL
-WHERE categories.archived_at IS NOT NULL
-    AND categories.type = EXCLUDED.type
 RETURNING *;

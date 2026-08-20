@@ -1,0 +1,46 @@
+info:
+  name: 19_updateCategory
+  type: http
+  seq: 19
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/categories/{{categoryId}}"
+  headers:
+    - name: Authorization
+      value: Bearer {{auth_token}}
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "testing",
+        "type": "income"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        const data = res.body;
+        const status = res.status;
+        const headers = res.headers;
+
+        expect(status).to.equal(200);
+        expect(res.headers['content-type']).to.include('application/json');
+
+        expect(data).to.have.property('id');
+        expect(data).to.have.property('name');
+        expect(data).to.have.property('created_at');
+        expect(data).to.have.property('type')
+        expect(data).to.have.property('user_id')
+
+        console.log('Category update successful');
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

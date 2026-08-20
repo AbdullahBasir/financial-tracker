@@ -27,7 +27,7 @@ func main() {
 
 	router.Handle("POST /categories", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateCategory)))
 	router.Handle("GET /categories", middleware.Auth(http.HandlerFunc(cfg.HandlerGetCategories)))
-	router.Handle("DELETE /categories/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerDeleteCategory)))
+	router.Handle("PATCH /categories/{id}", middleware.Auth(http.HandlerFunc(cfg.HandlerUpdateCategory)))
 
 	router.Handle("GET /transactions", middleware.Auth(http.HandlerFunc(cfg.HandlerGetTransactions)))
 	router.Handle("POST /transactions", middleware.Auth(http.HandlerFunc(cfg.HandlerCreateTransaction)))
