@@ -31,12 +31,11 @@ type Budget struct {
 }
 
 type Category struct {
-	ID         uuid.UUID
-	Name       string
-	CreatedAt  time.Time
-	Type       string
-	UserID     uuid.UUID
-	ArchivedAt sql.NullTime
+	ID        uuid.UUID
+	Name      string
+	CreatedAt time.Time
+	Type      string
+	UserID    uuid.UUID
 }
 
 type Transaction struct {
