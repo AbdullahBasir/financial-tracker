@@ -8,6 +8,9 @@ export function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [name, setName] = useState('')
   const [type, setType] = useState<'income' | 'expenses'>('expenses')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editType, setEditType] = useState<'income' | 'expenses'>('expenses')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -46,10 +49,29 @@ export function CategoriesPage() {
     }
   }
 
-  async function handleDelete(id: string) {
+  function handleEdit(category: Category) {
+    setEditingId(category.id)
+    setEditName(category.name)
+    setEditType(category.type)
+    setError('')
+  }
+
+  function handleCancelEdit() {
+    setEditingId(null)
+    setEditName('')
+  }
+
+  async function handleSaveEdit(id: string) {
+    if (!editName.trim()) return
     try {
-      await categoryService.remove(id)
-      setCategories(prev => prev.filter(a => a.id !== id))
+      const updatedCategory = await categoryService.update(id, {
+        name: editName.trim(),
+        type: editType,
+      })
+      setCategories(prev => prev.map(category => (
+        category.id === id ? updatedCategory : category
+      )))
+      handleCancelEdit()
     } catch (err) {
       setError((err as Error).message)
     }
@@ -79,7 +101,38 @@ export function CategoriesPage() {
       ) : (
         <ul>
           {categories.map(c => (
-            <li key={c.id}>{c.name} ({c.type}) <td><button onClick={() => handleDelete(c.id)}>Archive</button></td></li>
+            <li key={c.id}>
+              {editingId === c.id ? (
+                <>
+                  <input
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    aria-label={`Name for ${c.name}`}
+                  />
+                  <select
+                    value={editType}
+                    onChange={e => setEditType(e.target.value as 'income' | 'expenses')}
+                    aria-label={`Type for ${c.name}`}
+                  >
+                    <option value="expenses">Expenses</option>
+                    <option value="income">Income</option>
+                  </select>
+                  <button type="button" onClick={() => handleSaveEdit(c.id)} disabled={!editName.trim()}>
+                    Save
+                  </button>
+                  <button type="button" onClick={handleCancelEdit}>
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  {c.name} ({c.type})
+                  <button type="button" onClick={() => handleEdit(c)}>
+                    Edit
+                  </button>
+                </>
+              )}
+            </li>
           ))}
         </ul>
       )}
