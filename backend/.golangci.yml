@@ -1,0 +1,29 @@
+run:
+  timeout: 5m
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck      # catches unchecked error returns — important around DB/HTTP calls
+    - govet         # suspicious constructs (nil derefs, struct tag issues, etc.)
+    - staticcheck   # broad correctness + simplification checks
+    - unused         # unused variables, functions, imports
+    - ineffassign    # assignments that are never used
+    - gosimple       # flags code that can be simplified
+    - gofmt          # enforces standard Go formatting
+    - goimports      # enforces import grouping/ordering
+    - bodyclose      # catches unclosed HTTP response bodies — relevant since you're on net/http directly
+    - sqlclosecheck  # catches unclosed *sql.Rows / *sql.Stmt — relevant given SQLC + database/sql
+    - noctx          # flags HTTP requests made without context — good practice for cancellation/timeouts
+
+issues:
+  exclude-dirs:
+    - database/sqlc   # generated code — don't lint SQLC output, only hand-written code
+  exclude-rules:
+    # Test files can be a bit looser about unchecked errors (e.g. deferred cleanup)
+    - path: _test\.go
+      linters:
+        - errcheck
+
+output:
+  sort-results: true
