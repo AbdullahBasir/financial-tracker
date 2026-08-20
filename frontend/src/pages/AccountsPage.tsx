@@ -93,7 +93,7 @@ export function AccountsPage() {
         {accounts.map(acc => (
           <li key={acc.id}>
             <Link to={`/accounts/${acc.id}`}>{acc.name}</Link> — {acc.type}
-            <button onClick={() => handleDelete(acc.id)}>Delete</button>
+            <button className="btn-delete" onClick={() => handleDelete(acc.id)}>Delete</button>
           </li>
         ))}
       </ul>
