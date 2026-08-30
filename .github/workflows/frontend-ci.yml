@@ -3,23 +3,35 @@ name: Frontend CI
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'frontend/**'
-      - 'README.md'
-      - '.github/workflows/frontend-ci.yml'
   push:
     branches: [main]
-    paths:
-      - 'frontend/**'
-      - 'README.md'
-      - '.github/workflows/frontend-ci.yml'
 
 concurrency:
   group: frontend-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Check changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+              - 'README.md'
+              - '.github/workflows/frontend-ci.yml'
+
   build:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
