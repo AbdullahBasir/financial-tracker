@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - 'frontend/**'
+      - 'README.md'
       - '.github/workflows/frontend-ci.yml'
   push:
     branches: [main]
     paths:
       - 'frontend/**'
+      - 'README.md'
       - '.github/workflows/frontend-ci.yml'
 
 concurrency:
